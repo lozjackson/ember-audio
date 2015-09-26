@@ -1,0 +1,1 @@
+export { default } from 'ember-audio/components/audio-gain';
