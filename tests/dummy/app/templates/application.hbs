@@ -2,4 +2,11 @@
 
 {{audio-player src="http://localhost/test.mp3"}}
 
+{{tone-generator output=output}}
+
+{{#tone-generator as |src|}}
+  {{level-meter input=src}}
+  {{audio-filter input=src output=output}}
+{{/tone-generator}}
+
 {{outlet}}
