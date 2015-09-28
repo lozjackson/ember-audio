@@ -92,10 +92,11 @@ export default Ember.Mixin.create({
   inputChanged: Ember.observer('input', 'processor', function() {
     var input = this.get('input');
     var processor = this.get('processor');
-    if (input && processor){
-      input.connect(processor);
-    } else {
+    if ( input ) {
       input.disconnect(0);
+      if ( processor ) {
+        input.connect(processor);
+      }
     }
   }),
 
@@ -107,10 +108,11 @@ export default Ember.Mixin.create({
   ouputChanged: Ember.observer('output', 'processor', function() {
     var output = this.get('output');
     var processor = this.get('processor');
-    if ( output && processor ){
-      processor.connect(output);
-    } else {
+    if ( processor ) {
       processor.disconnect(0);
+      if ( output ) {
+        processor.connect(output);
+      }
     }
   })
 });
