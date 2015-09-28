@@ -69,19 +69,17 @@ export default Ember.Component.extend({
       var frequency = this.get('frequency') || 440;
       osc = context.createOscillator();
       this.set('osc', osc);
-
       osc.frequency.value = parseFloat(frequency);
-
       amp.gain.value = gain;
       osc.connect(amp);
-      osc.start();
+      osc.start(0);
     }
   },
 
   stop() {
     var osc = this.get('osc');
     if (osc) {
-      osc.stop();
+      osc.stop(0);
       this.set('osc', null);
     }
   },
