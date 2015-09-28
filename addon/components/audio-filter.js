@@ -1,90 +1,78 @@
+/**
+  @module ember-audio
+*/
 import Ember from 'ember';
+import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
 import layout from '../templates/components/audio-filter';
 
+/**
+  @class AudioFilterComponent
+  @namespace EmberAudio
+  @uses EmberAudio.ProcessorIoMixin
+*/
+export default Ember.Component.extend( ProcessorIoMixin, {
 
-export default Ember.Component.extend({
   layout: layout,
 
-  audioService: Ember.inject.service(),
+  type: 'lowpass',
 
-  input: null,
-
-  filter: null,
-
-  frequency: 1,
+  frequency: 1000,
 
   q: null,
 
-  minValue: 40,
+  gain: 0,
+
+  minValue: 20,
 
   maxValue: Ember.computed('audioService.audioContext', function() {
     var context = this.get('audioService.audioContext');
     return context.sampleRate / 2;
   }),
 
-  init() {
-    this._super(...arguments);
-    var input = this.get('input');
-    var output = this.get('output');
-    var context = this.get('audioService.audioContext');
-
-    if (context) {
-      // Create the filter.
-      var filter = context.createBiquadFilter();
-      filter.type = (typeof filter.type === 'string') ? 'lowpass' : 0; // LOWPASS
-      filter.frequency.value = 300;
-      filter.Q.value = 40;
-
-      if (input){
-        input.connect(filter);
-      }
-      if (output) {
-        filter.connect(output);
-      }
-
-      this.set('filter', filter)
-    }
+  createProcessor() {
+    var audioContext = this.get('audioService.audioContext');
+    var type = this.get('type');
+    var frequency = this.get('frequency');
+    var q = this.get('q');
+    var gain = this.get('gain');
+    var filter = audioContext.createBiquadFilter();
+    filter.type = (typeof filter.type === 'string') ? type : 0;
+    filter.frequency.value = frequency;
+    filter.Q.value = q;
+    filter.gain.value = gain;
+    return filter;
   },
 
-  _frequency: Ember.computed( 'frequency', {
+  _frequency: Ember.computed( 'frequency', 'processor', {
     get() {
-      var filter = this.get('filter');
+      var filter = this.get('processor');
       return filter.frequency.value;
     },
     set( key, value ) {
-      var filter = this.get('filter');
+      var filter = this.get('processor');
       return filter.frequency.value = value;
     }
   }),
 
-  _q: Ember.computed('q', {
+  _q: Ember.computed('q', 'processor', {
     get() {
-      var filter = this.get('filter');
+      var filter = this.get('processor');
       return filter.Q.value
     },
     set( key, value ) {
-      var filter = this.get('filter');
+      var filter = this.get('processor');
       return filter.Q.value = value;
     }
   }),
 
-  inputChanged: Ember.observer('input', function() {
-    var input = this.get('input');
-    var filter = this.get('filter');
-    if (input && filter){
-      input.connect(filter);
-    } else {
-      input.disconnect(0);
-    }
-  }),
-
-  ouputChanged: Ember.observer('output', function() {
-    var output = this.get('output');
-    var filter = this.get('filter');
-    if (output && filter){
-      filter.connect(output);
-    } else {
-      filter.disconnect(0);
+  _gain: Ember.computed('gain', 'processor', {
+    get() {
+      var filter = this.get('processor');
+      return filter.gain.value
+    },
+    set( key, value ) {
+      var filter = this.get('processor');
+      return filter.gain.value = value;
     }
   })
 });
