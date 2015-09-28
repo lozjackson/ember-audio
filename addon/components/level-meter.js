@@ -1,6 +1,15 @@
+/**
+  @module ember-audio
+*/
 import Ember from 'ember';
+import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
 
-export default Ember.Component.extend({
+/**
+  @class LevelMeterComponent
+  @namespace EmberAudio
+  @uses EmberAudio.ProcessorIoMixin
+*/
+export default Ember.Component.extend( ProcessorIoMixin, {
 
   tagName: 'canvas',
 
@@ -8,39 +17,64 @@ export default Ember.Component.extend({
 
   classNames: ['ember-audio', 'level-meter'],
 
-  analyser: null,
-
-  input: null,
-
   width: 40,
 
   height: 200,
 
-  init() {
-    this._super(...arguments);
+  createProcessor() {
+    var audioContext = this.get('audioService.audioContext');
+    var processor = audioContext.createScriptProcessor(1024,1,1);
+    return processor;
+  },
+
+  /**
+    Connect the processor to the input and output.
+
+    NOTE: Both input and output of the level meter must be connected, otherwise the
+    level meter doesn't work.  So if `output` is not provided then the output is
+    connected to the `audioContext.destination` object.
+
+    @method connectProcessor
+    @param {Object} processor
+  */
+  connectProcessor(processor) {
     var input = this.get('input');
-    var context = input.context;
-    if (context)
-    {
-      var analyser = context.createScriptProcessor(1024,1,1);
-      this.set('analyser', analyser);
-      input.connect(analyser);
-      analyser.connect(context.destination);
+    var output = this.get('output') || this.get('audioService.output');
+    if ( input ){
+      input.connect(processor);
+    }
+    if ( output ) {
+      processor.connect(output);
     }
   },
+
+  /**
+    If the output changes, connect the processor to it.
+
+    @method outputChanged
+  */
+  ouputChanged: Ember.observer('output', 'processor', function() {
+    var output = this.get('output') || this.get('audioService.output');
+    var processor = this.get('processor');
+    if ( output && processor ) {
+      processor.connect(output);
+    } else {
+      processor.disconnect(0);
+    }
+  }),
 
   didInsertElement() {
     var canvas = this.$()[0];
   	var ctx = canvas.getContext('2d');
   	var w = canvas.width;
   	var h = canvas.height;
-    var analyser = this.get('analyser');
+    var processor = this.get('processor');
 
   	//fill the canvas first
   	ctx.fillStyle = '#555';
   	ctx.fillRect(0,0,w,h);
 
-    analyser.onaudioprocess = function(e){
+    processor.onaudioprocess = function(e){
   		var out = e.outputBuffer.getChannelData(0);
   		var int = e.inputBuffer.getChannelData(0);
   		var max = 0;
