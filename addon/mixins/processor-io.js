@@ -40,6 +40,7 @@ export default Ember.Mixin.create({
 
     @property audioService
     @type {Object}
+    @private
   */
   audioService: Ember.inject.service(),
 
