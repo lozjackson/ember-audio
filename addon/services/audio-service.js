@@ -3,6 +3,7 @@
 */
 import Ember from 'ember';
 import AudioBusObject from 'ember-audio/objects/audio-bus';
+import GainObject from 'ember-audio/objects/gain';
 
 
 /**
@@ -27,6 +28,10 @@ export default Ember.Service.extend({
   */
   audioContext: null,
 
+  /**
+    @property busses
+    @type {Array}
+  */
   busses: Ember.A(),
 
   /**
@@ -60,12 +65,20 @@ export default Ember.Service.extend({
     }
   },
 
+  /**
+    @method createBus
+    @private
+  */
   createBus() {
     var audioBusObject = AudioBusObject.create({audioService:this});
     var busses = this.get('busses');
     busses.pushObject(audioBusObject);
   },
 
+  /**
+    @method addBuss
+    @param {Integer} number The number of busses to add.
+  */
   addBuss( number ) {
     if (typeof number === 'number') {
       for(var i = 0; i < parseInt(number); i++) {
@@ -74,5 +87,13 @@ export default Ember.Service.extend({
     } else {
       this.createBus();
     }
+  },
+
+  /**
+    @method createGain
+  */
+  createGain() {
+    var gainObject = GainObject.create({ audioService:this });
+    return gainObject;
   }
 });
