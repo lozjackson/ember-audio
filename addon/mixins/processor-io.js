@@ -34,17 +34,6 @@ export default Ember.Mixin.create({
   processor: null,
 
   /**
-    This is the `audioService` service.  It represents the audio system and gives
-    us acces to the `AudioContext` object which among other things provides the
-    audio output.
-
-    @property audioService
-    @type {Object}
-    @private
-  */
-  audioService: Ember.inject.service(),
-
-  /**
     The component should override this method to implement the processor and set
     the processor's default values.
 
@@ -83,6 +72,32 @@ export default Ember.Mixin.create({
     if (output) {
       processor.connect(output);
     }
+  },
+
+  /**
+    ## connect
+
+    Connect this `audioNode` to another `audioNode`.  This method is a proxy for
+    the processor's `connect` method.
+
+    @method connect
+  */
+  connect() {
+    var processor = this.get('processor');
+    processor.connect(...arguments);
+  },
+
+  /**
+    ## disconnect
+
+    Disconnect the `audioNode` from another `audioNode`.  This method is a proxy
+    for the processor's `disconnect` method.
+
+    @method disconnect
+  */
+  disconnect() {
+    var processor = this.get('processor');
+    processor.disconnect(...arguments);
   },
 
   /**
