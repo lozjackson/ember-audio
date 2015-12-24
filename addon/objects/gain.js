@@ -4,6 +4,9 @@
 import Ember from 'ember';
 import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
 
+var alias = Ember.computed.alias;
+var observer = Ember.observer;
+
 /**
   ## GainObject
 
@@ -18,6 +21,13 @@ import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
 export default Ember.Object.extend( ProcessorIoMixin, {
 
   /**
+    @property audioService
+    @type {Object}
+    @private
+  */
+  audioService: null,
+
+  /**
     ## gain
 
     @property gain
@@ -26,34 +36,51 @@ export default Ember.Object.extend( ProcessorIoMixin, {
   */
   gain: 1,
 
+  /**
+    This is the minimum value for this gain range.  It can be used for setting
+    the minimum value of the range slider.
+
+    @property min
+    @type {Number}
+  */
   min: 0,
 
+  /**
+    This is the maximum value for this gain range.  It can be used for setting
+    the maximum value of the range slider.
+
+    @property max
+    @type {Number}
+  */
   max: 1,
 
   /**
-    @property linearGain
-    @type {Boolean}
-  */
-  linearGain: false,
+    Alias of `audioService.audioContext`
 
+    @property audioContext
+    @type {Object}
+    @private
+  */
+  audioContext: alias('audioService.audioContext'),
+
+  /**
+    @method createProcessor
+  */
   createProcessor() {
     var gain = this.get('gain');
-    var linearGain = this.get('linearGain');
-    var audioContext = this.get('audioService.audioContext');
-    if ( audioContext ) {
+    var audioContext = this.get('audioContext');
+    if ( audioContext && typeof audioContext.createGain === 'function' ) {
       var processor = audioContext.createGain();
-      processor.gain.value = (linearGain) ? gain : gain * gain;
+      processor.gain.value = gain;
       return processor;
     }
   },
 
   /**
-    @method volumeChanged
+    @event volumeChanged
   */
-  volumeChanged: Ember.observer( 'gain', 'linearGain', 'processor', function() {
-    var amp = this.get('processor');
-    var gain = this.get('gain');
-    var linearGain = this.get('linearGain');
-    amp.gain.value = (linearGain) ? gain : gain * gain;
+  volumeChanged: observer( 'gain', function() {
+    var {gain, processor} = this.getProperties('gain', 'processor');
+    processor.gain.value = gain;
   })
 });
