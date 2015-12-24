@@ -5,6 +5,8 @@ import Ember from 'ember';
 import AudioBusObject from 'ember-audio/objects/audio-bus';
 import GainObject from 'ember-audio/objects/gain';
 
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioContext = new AudioContext();
 
 /**
   ## Audio Service
@@ -26,7 +28,7 @@ export default Ember.Service.extend({
     @property audioService
     @type {Object}
   */
-  audioContext: null,
+  audioContext: audioContext,
 
   /**
     @property busses
@@ -57,11 +59,10 @@ export default Ember.Service.extend({
   */
   init() {
     this._super(...arguments);
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-    var context = new AudioContext();
-    this.set('audioContext', context);
-    if ( context.state === 'running' ) {
-      Ember.Logger.debug(`Ember-audio: ${context.sampleRate} Khz; Channel count: ${context.destination.channelCount}`);
+    this.set('busses', Ember.A());
+    var context = this.get('audioContext');
+    if ( context && context.state === 'running' ) {
+      Ember.Logger.debug(`Ember-audio: ${context.sampleRate / 1000} Khz; Channel count: ${context.destination.channelCount}`);
     }
   },
 
@@ -79,7 +80,7 @@ export default Ember.Service.extend({
     @method addBuss
     @param {Integer} number The number of busses to add.
   */
-  addBuss( number ) {
+  addBus( number ) {
     if (typeof number === 'number') {
       for(var i = 0; i < parseInt(number); i++) {
         this.createBus();
@@ -90,10 +91,24 @@ export default Ember.Service.extend({
   },
 
   /**
+
+    ```
+      var firstBus = this.get('busses').objectAt(0);
+      var output = this.get('output');
+      var gain = this.createGain({
+        input: firstBus.bus,
+        output: output
+      });
+    ```
+
     @method createGain
+    @param {Object} params
   */
-  createGain() {
+  createGain(params) {
     var gainObject = GainObject.create({ audioService:this });
+    if (params) {
+      gainObject.setProperties(params);
+    }
     return gainObject;
   }
 });
