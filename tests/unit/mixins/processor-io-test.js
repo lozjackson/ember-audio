@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
+import ProcessorIoMixin from '../../../mixins/processor-io';
 import { module, test } from 'qunit';
 
 module('Unit | Mixin | processor io');
@@ -9,6 +9,16 @@ test('it works', function(assert) {
   var ProcessorIoObject = Ember.Object.extend(ProcessorIoMixin);
   var subject = ProcessorIoObject.create();
   assert.ok(subject);
+});
+
+test('audioContext alias', function(assert) {
+  var ProcessorIoObject = Ember.Object.extend(ProcessorIoMixin);
+  var subject = ProcessorIoObject.create();
+  subject.set('audioService', {
+    name: 'audio-service',
+    audioContext: { name: 'audio-context' }
+  });
+  assert.equal(subject.get('audioContext.name'), 'audio-context', `'audioContext.name' should be 'audio-context'`);
 });
 
 test('createProcessor method is called when the object is created', function(assert) {

@@ -3,6 +3,8 @@
 */
 import Ember from 'ember';
 
+var alias = Ember.computed.alias;
+
 /**
   This mixin provides properties and methods for the i/o of the processing node.
 
@@ -35,6 +37,15 @@ export default Ember.Mixin.create({
     @private
   */
   processor: null,
+
+  /**
+    Alias of `audioService.audioContext`
+
+    @property audioContext
+    @type {Object}
+    @private
+  */
+  audioContext: alias('audioService.audioContext'),
 
   /**
     The component/object should override this method to implement the processor
