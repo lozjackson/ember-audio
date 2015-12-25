@@ -77,7 +77,7 @@ export default Ember.Service.extend({
   },
 
   /**
-    @method addBuss
+    @method addBus
     @param {Integer} number The number of busses to add.
   */
   addBus( number ) {
