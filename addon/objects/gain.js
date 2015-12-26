@@ -4,7 +4,6 @@
 import Ember from 'ember';
 import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
 
-var alias = Ember.computed.alias;
 var observer = Ember.observer;
 
 /**
@@ -53,15 +52,6 @@ export default Ember.Object.extend( ProcessorIoMixin, {
     @type {Number}
   */
   max: 1,
-
-  /**
-    Alias of `audioService.audioContext`
-
-    @property audioContext
-    @type {Object}
-    @private
-  */
-  audioContext: alias('audioService.audioContext'),
 
   /**
     @method createProcessor
