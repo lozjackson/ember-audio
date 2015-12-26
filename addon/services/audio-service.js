@@ -71,8 +71,11 @@ export default Ember.Service.extend({
     @private
   */
   createBus() {
-    var audioBusObject = AudioBusObject.create({audioService:this});
     var busses = this.get('busses');
+    var audioBusObject = AudioBusObject.create({
+      audioService: this,
+      id: busses.get('length') + 1
+    });
     busses.pushObject(audioBusObject);
   },
 
