@@ -29,6 +29,8 @@ export default Ember.Mixin.create({
   */
   output: null,
 
+  outputs: [],
+
   /**
     This is the audio processing module.
 
@@ -66,6 +68,7 @@ export default Ember.Mixin.create({
   init() {
     this._super(...arguments);
     var processor = this.createProcessor();
+    this.set('outputs', []);
     if (processor) {
       this.set('processor', processor);
       this.connectProcessor(processor);
@@ -102,20 +105,69 @@ export default Ember.Mixin.create({
   */
   connect() {
     var processor = this.get('processor');
-    processor.connect(...arguments);
+    if (processor) {
+      processor.connect(...arguments);
+    }
   },
 
   /**
     ## disconnect
 
-    Disconnect the `audioNode` from another `audioNode`.  This method is a proxy
+    Disconnect the output of the `processor` from another `audioNode`.  This method is a proxy
     for the processor's `disconnect` method.
 
     @method disconnect
   */
   disconnect() {
     var processor = this.get('processor');
-    processor.disconnect(...arguments);
+    if (processor) {
+      processor.disconnect(...arguments);
+    }
+  },
+
+  /**
+    @method connectOutput
+    @param {Object} node
+    @param {Integer} output
+      The index of the output in the `outputs` array.
+  */
+  connectOutput(node, output) {
+    // if the output is not specified, then assume output 0.
+    if (isNaN(output)) {
+      output = 0;
+    }
+    var outputs = this.get('outputs');
+
+    // if there is a node in the outputs array at the index disconnect the node
+    var oldNode = outputs[output];
+    if (oldNode) {
+      this.disconnect(oldNode);
+    }
+
+    if (node) {
+      // store the node in the outputs array.
+      outputs[output] = node;
+      // connect to the node
+      this.connect(node);
+    }
+  },
+
+  changeInput() {
+    var input = this.get('input');
+    var processor = this.get('processor');
+    if ( input ) {
+      input.disconnect(0);
+      if ( processor ) {
+        input.connect(processor);
+      }
+    }
+  },
+
+  changeOutput() {
+    var output = this.get('output');
+    if (output) {
+      this.connectOutput(output);
+    }
   },
 
   /**
@@ -125,14 +177,7 @@ export default Ember.Mixin.create({
     @private
   */
   inputChanged: Ember.observer('input', 'processor', function() {
-    var input = this.get('input');
-    var processor = this.get('processor');
-    if ( input ) {
-      input.disconnect(0);
-      if ( processor ) {
-        input.connect(processor);
-      }
-    }
+    this.changeInput();
   }),
 
   /**
@@ -142,13 +187,6 @@ export default Ember.Mixin.create({
     @private
   */
   ouputChanged: Ember.observer('output', 'processor', function() {
-    var output = this.get('output');
-    var processor = this.get('processor');
-    if ( processor ) {
-      processor.disconnect(0);
-      if ( output ) {
-        processor.connect(output);
-      }
-    }
+    this.changeOutput();
   })
 });
