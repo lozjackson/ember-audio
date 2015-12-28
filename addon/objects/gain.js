@@ -2,24 +2,34 @@
   @module ember-audio
 */
 import Ember from 'ember';
-import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
+import ProcessorMixin from 'ember-audio/mixins/processor';
+import io from 'ember-audio/mixins/io';
 
 var observer = Ember.observer;
 
 /**
   ## GainObject
 
-  This is a gain component. A `gain` value of `1` will produce full volume ( 0dB )
+  This is a gain object. A `gain` value of `1` will produce full volume ( 0dB )
   output.  The output will be the same level as the input with no attenuation or
   gain being applied.  A `gain` value of `0` will produce no output.
 
   @class GainObject
   @namespace EmberAudio
-  @uses EmberAudio.ProcessorIoMixin
+  @uses EmberAudio.IoMixin
+  @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Object.extend( ProcessorIoMixin, {
+export default Ember.Object.extend( io, ProcessorMixin, {
 
   /**
+    This is required and is not automatically injected.  Pass in the audioService
+    when creating it.
+
+      ```
+      GainObject.create({
+        audioService: this.get('audioService')
+      });
+      ```
     @property audioService
     @type {Object}
     @private
