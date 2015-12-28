@@ -81,32 +81,32 @@ test('busses should not be the same object', function(assert) {
   assert.equal(service.get('busses').objectAt(1).get('name'), 'Two', `first bus name should be 'Two'`);
 });
 
-test('busses should not share nodes', function(assert) {
-  assert.expect(9);
-  var service = this.subject();
-
-  service.addBus(2);
-  assert.equal(service.get('busses.length'), 2, `'busses.length' should be 2`);
-
-  var bus1 = service.get('busses').objectAt(0);
-  assert.equal(bus1.get('nodes.length'), 0, `'bus1.nodes.length' should be 0`);
-
-  var bus2 = service.get('busses').objectAt(1);
-  assert.equal(bus2.get('nodes.length'), 0, `'bus2.nodes.length' should be 0`);
-
-  bus1.addGain();
-
-  assert.equal(bus1.get('nodes.length'), 1, `'bus1.nodes.length' should be 1`);
-  assert.equal(bus2.get('nodes.length'), 0, `'bus2.nodes.length' should be 0`);
-
-  bus1.addGain();
-  assert.equal(bus1.get('nodes.length'), 2, `'bus1.nodes.length' should be 2`);
-  assert.equal(bus2.get('nodes.length'), 0, `'bus2.nodes.length' should be 0`);
-
-  bus2.addGain();
-  assert.equal(bus1.get('nodes.length'), 2, `'bus1.nodes.length' should be 2`);
-  assert.equal(bus2.get('nodes.length'), 1, `'bus2.nodes.length' should be 1`);
-});
+// test('busses should not share nodes', function(assert) {
+//   assert.expect(9);
+//   var service = this.subject();
+//
+//   service.addBus(2);
+//   assert.equal(service.get('busses.length'), 2, `'busses.length' should be 2`);
+//
+//   var bus1 = service.get('busses').objectAt(0);
+//   assert.equal(bus1.get('nodes.length'), 0, `'bus1.nodes.length' should be 0`);
+//
+//   var bus2 = service.get('busses').objectAt(1);
+//   assert.equal(bus2.get('nodes.length'), 0, `'bus2.nodes.length' should be 0`);
+//
+//   bus1.addGain();
+//
+//   assert.equal(bus1.get('nodes.length'), 1, `'bus1.nodes.length' should be 1`);
+//   assert.equal(bus2.get('nodes.length'), 0, `'bus2.nodes.length' should be 0`);
+//
+//   bus1.addGain();
+//   assert.equal(bus1.get('nodes.length'), 2, `'bus1.nodes.length' should be 2`);
+//   assert.equal(bus2.get('nodes.length'), 0, `'bus2.nodes.length' should be 0`);
+//
+//   bus2.addGain();
+//   assert.equal(bus1.get('nodes.length'), 2, `'bus1.nodes.length' should be 2`);
+//   assert.equal(bus2.get('nodes.length'), 1, `'bus2.nodes.length' should be 1`);
+// });
 
 test('createGain method', function(assert) {
   assert.expect(1);
