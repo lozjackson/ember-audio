@@ -105,9 +105,21 @@ export default Ember.Mixin.create({
     var oldNode = outputs[output];
     if (oldNode) {
       this.disconnect(oldNode);
+      outputs[output] = null;
     }
 
     if (node) {
+
+      /*
+        We want the native `audioNode` object, not an `Ember.Object`.  If the
+        `node` passed in is an instance of an `Ember.Object`, and it has a
+        `processor` property then we need to use the `processor` object as the
+        node to connect to.
+      */
+      if (Ember.typeOf(node) === 'instance' && node.get('processor')) {
+        node = node.get('processor');
+      }
+
       // store the node in the outputs array.
       outputs[output] = node;
       // connect to the node
