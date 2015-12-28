@@ -5,6 +5,7 @@ import Ember from 'ember';
 
 var computed = Ember.computed;
 var alias = computed.alias;
+var readOnly = computed.readOnly;
 var observer = Ember.observer;
 
 /**
@@ -64,6 +65,18 @@ export default Ember.Mixin.create({
   audioContext: alias('audioService.audioContext'),
 
   /**
+    @property input
+    @type {Object}
+  */
+  input: readOnly('bus'),
+
+  /**
+    @property output
+    @type {Object}
+  */
+  output: readOnly('bus'),
+
+  /**
     Computed Property.  The gain/polarity of the bus.
 
     @property _gain
@@ -77,7 +90,7 @@ export default Ember.Mixin.create({
 
   /**
     Create the bus and set the gain.
-    
+
     @method init
     @private
   */
@@ -114,6 +127,44 @@ export default Ember.Mixin.create({
     }
     if (bus) {
       bus.gain.value = (mute) ? 0 : gain;
+    }
+  },
+
+  /**
+    @method connectOutput
+    @param {Object} node
+  */
+  connectOutput(node) {
+    this.connect(node);
+  },
+
+  /**
+    ## connect
+
+    Connect the `bus` to another `audioNode`.  This method is a proxy for
+    the `bus` object's `connect` method.
+
+    @method connect
+  */
+  connect() {
+    var bus = this.get('bus');
+    if (bus) {
+      bus.connect(...arguments);
+    }
+  },
+
+  /**
+    ## disconnect
+
+    Disconnect the `bus` from another `audioNode`.  This method is a proxy
+    for the `bus` object's `disconnect` method.
+
+    @method disconnect
+  */
+  disconnect() {
+    var bus = this.get('bus');
+    if (bus) {
+      bus.disconnect(...arguments);
     }
   },
 
