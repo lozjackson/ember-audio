@@ -79,18 +79,6 @@ export default Ember.Mixin.create({
       }
     }
   },
-  // connectProcessor(processor) {
-  //   var input = this.get('input');
-  //   var output = this.get('output');
-  //   if (input){
-  //     input.connect(processor);
-  //   }
-  //   if (output) {
-  //     processor.connect(output);
-  //   }
-  // },
-
-
 
   /**
     If the input changes, connect it to the processor.

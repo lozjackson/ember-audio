@@ -237,23 +237,6 @@ test('connectProcessor method connects input to processor to output', function(a
 //   assert.ok(subject);
 // });
 
-// test('changeOutput method', function (assert) {
-//   assert.expect(3);
-//
-//   var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
-//     output: {id:1},
-//     connectOutput: function (obj) {
-//       assert.ok(true, `'connectOutput' method has been called`);
-//       assert.equal(obj.id, 1, `obj.id should be 1`);
-//     }
-//   });
-//
-//   var subject = ProcessorObject.create();
-//
-//   subject.changeOutput();
-//   assert.ok(subject);
-// });
-
 test('inputChanged observer', function(assert) {
   assert.expect(3);
 
@@ -271,94 +254,6 @@ test('inputChanged observer', function(assert) {
   assert.ok(subject);
 });
 
-// test('inputChanged observer - change input', function(assert) {
-//   assert.expect(5);
-//
-//   var input = {
-//     connect: function (obj) {
-//       assert.ok(true, `'input.connect' method has been called`);
-//       assert.equal(obj.name, 'processor', `input is connected to processor`);
-//     },
-//     disconnect: function (obj) {
-//       assert.ok(true, `'input.disconnect' method has been called`);
-//       assert.equal(obj, 0, `input is disconnected`);
-//     }
-//   };
-//
-//   var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
-//     createProcessor: function () {
-//       return { name: 'processor' };
-//     }
-//   });
-//
-//   var subject = ProcessorObject.create();
-//   subject.set('input', input);
-//   assert.ok(subject);
-// });
-//
-// test('inputChanged observer - change processor', function(assert) {
-//   assert.expect(9);
-//
-//   var input = {
-//     connect: function (obj) {
-//       assert.ok(true, `'input.connect' method has been called`);
-//       assert.equal(typeof obj, 'object');
-//       // assert.equal(obj.name, 'processor', `input is connected to processor`);
-//     },
-//     disconnect: function (obj) {
-//       assert.ok(true, `'input.disconnect' method has been called`);
-//       assert.equal(obj, 0, `input is disconnected`);
-//     }
-//   };
-//
-//   var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
-//     createProcessor: function () {
-//       return {
-//         name: 'test',
-//         disconnect: function () {
-//         }
-//       };
-//     }
-//   });
-//
-//   var subject = ProcessorObject.create();
-//   subject.set('input', input);
-//   subject.set('processor', {
-//     name: 'processor',
-//     disconnect: function () {
-//     }
-//   });
-//   assert.ok(subject);
-// });
-
-// test('outputChanged observer - change output', function(assert) {
-//   assert.expect(5);
-//
-//   var output = {
-//     name: 'output'
-//   };
-//
-//   var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
-//     createProcessor: function () {
-//       return {
-//         name: 'processor',
-//         connect: function (obj) {
-//           assert.ok(true, `'processor.connect' method has been called`);
-//           assert.equal(obj.name, 'output', `processor is connected to output`);
-//         },
-//         disconnect: function (obj) {
-//           assert.ok(true, `'processor.disconnect' method has been called`);
-//           assert.equal(obj, 0, `processor is disconnected`);
-//         }
-//       };
-//     }
-//   });
-//
-//   var subject = ProcessorObject.create();
-//   subject.set('output', output);
-//   assert.ok(subject);
-// });
-
 test('outputChanged observer', function(assert) {
   assert.expect(3);
 
@@ -372,42 +267,3 @@ test('outputChanged observer', function(assert) {
   subject.set('output', {});
   assert.ok(subject);
 });
-
-// test('outputChanged observer - change processor', function(assert) {
-//   assert.expect(9);
-//
-//   var output = {
-//     name: 'output'
-//   };
-//
-//   var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
-//     createProcessor: function () {
-//       return {
-//         name: 'test',
-//         connect: function (obj) {
-//           assert.ok(true, `'processor.connect' method has been called`);
-//           assert.equal(obj.name, 'output', `processor is connected to output`);
-//         },
-//         disconnect: function (obj) {
-//           assert.ok(true, `'processor.disconnect' method has been called`);
-//           assert.equal(obj, 0, `processor is disconnected`);
-//         }
-//       };
-//     }
-//   });
-//
-//   var subject = ProcessorObject.create();
-//   subject.set('output', output);
-//   subject.set('processor', {
-//     name: 'processor',
-//     connect: function (obj) {
-//       assert.ok(true, `'processor.connect' method has been called`);
-//       assert.equal(obj.name, 'output', `processor is connected to output`);
-//     },
-//     disconnect: function (obj) {
-//       assert.ok(true, `'processor.disconnect' method has been called`);
-//       assert.equal(obj, 0, `processor is disconnected`);
-//     }
-//   });
-//   assert.ok(subject);
-// });
