@@ -7,8 +7,6 @@ import AudioBusMixin from 'ember-audio/mixins/audio-bus';
 /**
   ## AudioBusObject
 
-  An `AudioBusObject` is a chain of audio nodes.
-
   @class AudioBusObject
   @namespace EmberAudio
   @uses EmberAudio.AudioBusMixin
@@ -31,38 +29,10 @@ export default Ember.Object.extend( AudioBusMixin, {
   audioService: null,
 
   /**
+    This is only used for reference.
+
     @property id
     @type {Integer}
   */
-  id: null,
-
-  /**
-    @property nodes
-    @type {Array}
-  */
-  nodes: Ember.A(),
-
-  /**
-    @method init
-  */
-  init() {
-    this._super(...arguments);
-    this.set('nodes', Ember.A());
-  },
-
-  /**
-    @method addGain
-    @return {Object}
-  */
-  addGain() {
-    var { audioService, bus, nodes } = this.getProperties('audioService', 'bus', 'nodes');
-    if (audioService) {
-      var gain = audioService.createGain({
-        input: bus,
-        output: audioService.get('output')
-      });
-      nodes.pushObject(gain);
-      return gain;
-    }
-  }
+  id: null
 });
