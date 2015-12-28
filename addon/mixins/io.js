@@ -63,6 +63,7 @@ export default Ember.Mixin.create({
     the processor's `connect` method.
 
     @method connect
+    @private
   */
   connect() {
     var processor = this.get('processor');
@@ -78,6 +79,7 @@ export default Ember.Mixin.create({
     for the processor's `disconnect` method.
 
     @method disconnect
+    @private
   */
   disconnect() {
     var processor = this.get('processor');
@@ -115,6 +117,7 @@ export default Ember.Mixin.create({
 
   /**
     @method changeInput
+    @private
   */
   changeInput() {
     var input = this.get('input');
@@ -126,6 +129,7 @@ export default Ember.Mixin.create({
 
   /**
     @method changeOutput
+    @private
   */
   changeOutput() {
     var output = this.get('output');
