@@ -2,17 +2,23 @@
   @module ember-audio
 */
 import Ember from 'ember';
+import io from 'ember-audio/mixins/io';
 
 var alias = Ember.computed.alias;
 var observer = Ember.observer;
 
 /**
-  This mixin provides properties and methods for the i/o of the processing node.
+  ## Channel Strip
+
+  This is a processing chain - A chain of audio processor nodes connected in series.
+  There is an gain node at either end of the chain that represent the input and
+  output of the channel strip.
 
   @class ChannelStripObject
   @namespace EmberAudio
+  @uses EmberAudio.IoMixin
 */
-export default Ember.Object.extend({
+export default Ember.Object.extend(io, {
 
   /**
     This is required and is not automatically injected.  Pass in the audioService
@@ -30,33 +36,38 @@ export default Ember.Object.extend({
   audioService: null,
 
   /**
+    This is only used for reference.
+
     @property id
     @type {Integer}
   */
   id: null,
 
   /**
-    The input of the channel strip.
+    ## Input Gain Stage
 
-    @property input
+    This is a Gain Object and is the first node in the processing chain.  It sets
+    the input gain of the channel strip.
+
+    @property inputGainStage
     @type {Object}
   */
-  input: null,
-
-  /**
-    The output of the channel strip.
-
-    @property output
-    @type {Object}
-  */
-  output: null,
-
   inputGainStage: null,
 
+  /**
+    ## Output Gain Stage
+
+    This is a Gain Object and is the last node in the processing chain.  It sets
+    the output gain of the channel strip.
+
+    @property inputGainStage
+    @type {Object}
+  */
   outputGainStage: null,
 
   /**
-    An array of processing nodes that sit between the input and output.
+    An array of processing nodes that sit between the input and output.  These
+    nodes together with the input/output gain stages form the processing chain.
 
     @property nodes
     @type {Array}
@@ -73,45 +84,40 @@ export default Ember.Object.extend({
   audioContext: alias('audioService.audioContext'),
 
   /**
+    Alias of `outputGainStage`.  This is for compatibility with the `IoMixin`.
+
+    @property processor
+    @type {Object}
+    @private
+  */
+  processor: alias('outputGainStage'),
+
+  /**
     @method init
     @private
   */
   init() {
     this._super(...arguments);
     this.set('nodes', Ember.A());
-    // this.createInputGainStage();
-    // this.createOutputGainStage();
     if (!this.get('audioService')) {
       Ember.Logger.warn('`audioService` is not defined.');
     }
-    // Ember.Logger.log('audioService', this.get('audioService'));
     this.createIO();
-
-    // var inputGainStage = this.get('inputGainStage');
-    // var outputGainStage = this.get('outputGainStage');
-    // Ember.Logger.log('message', inputGainStage);
-    // if (inputGainStage && outputGainStage) {
-    //
-    //   inputGainStage.connect(outputGainStage);
-    // }
   },
 
+  /**
+    @method chainNodes
+    @private
+  */
   chainNodes() {
     var {inputGainStage, outputGainStage, nodes} = this.getProperties('inputGainStage', 'outputGainStage', 'nodes');
     var nodesLength = nodes.get('length');
     if (nodesLength === 0) {
       if (inputGainStage && outputGainStage) {
-        inputGainStage.connect(outputGainStage);
+        inputGainStage.connectOutput(outputGainStage.get('processor'));
       }
-    } else if (nodesLength === 1) {
-      nodes.get('firstObject').setProperties({
-        input: inputGainStage,
-        output: outputGainStage
-      });
     } else {
-
-      nodes.get('firstObject').set('input', inputGainStage);
-
+      inputGainStage.connectOutput(nodes.get('firstObject').get('processor'));
       for (var i = 0; i < nodesLength; i++) {
         var nextNodeIndex = i + 1;
         if (nextNodeIndex < nodesLength) {
@@ -121,12 +127,14 @@ export default Ember.Object.extend({
           }
         }
       }
-
-      nodes.get('lastObject').connectOutput(outputGainStage);
-      // nodes.get('lastObject').set('output', outputGainStage);
+      nodes.get('lastObject').connectOutput(outputGainStage.get('processor'));
     }
   },
 
+  /**
+    @method createIO
+    @private
+  */
   createIO() {
     this.createInputGainStage();
     this.createOutputGainStage();
@@ -150,18 +158,16 @@ export default Ember.Object.extend({
   },
 
   /**
+    Calls the `audioService.createGain` method.
+
     @method createGain
     @return {Object} gain
     @private
   */
   createGain() {
-    // var audioService = this.audioService;
-    // if (audioService && typeof audioService.createGain === 'function') {
-    //   return audioService.createGain();
-    // }
-    var audioContext = this.get('audioContext');
-    if (audioContext && typeof audioContext.createGain === 'function') {
-      return audioContext.createGain();
+    var audioService = this.audioService;
+    if (audioService && typeof audioService.createGain === 'function') {
+      return audioService.createGain();
     }
   },
 
@@ -188,19 +194,25 @@ export default Ember.Object.extend({
   },
 
   /**
+    @method changeInput
+    @private
+  */
+  changeInput() {
+    var input = this.get('input');
+    var inputGainStage = this.get('inputGainStage');
+    if (input && inputGainStage) {
+      input.connectOutput(inputGainStage.get('processor'));
+    }
+  },
+
+  /**
     If the `input` changes, connect it to the `inputGainStage`.
 
     @event inputChanged
     @private
   */
   inputChanged: observer('input', 'inputGainStage', function() {
-    var {input, inputGainStage} = this.getProperties('input', 'inputGainStage');
-    if ( input ) {
-      input.disconnect(0);
-      if ( inputGainStage ) {
-        input.connect(inputGainStage);
-      }
-    }
+    this.changeInput();
   }),
 
   /**
@@ -209,33 +221,7 @@ export default Ember.Object.extend({
     @event outputChanged
     @private
   */
-  ouputChanged: observer('output', 'outputGainStage', function() {
-    var {output, outputGainStage} = this.getProperties('output', 'outputGainStage');
-    if ( outputGainStage ) {
-      outputGainStage.disconnect(0);
-      if ( output ) {
-        outputGainStage.connect(output);
-      }
-    }
-  }),
-
-  // chainChanged: observer('inputGainStage', 'outputGainStage', 'nodes.[]', function () {
-  //   this.chainNodes();
-  // })
-
-  // chainNodes: observer('inputGainStage', 'outputGainStage', 'nodes.[]', function () {
-  //   var {inputGainStage, outputGainStage, nodes} = this.getProperties('inputGainStage', 'outputGainStage', 'nodes');
-  //   if (nodes.get('length') === 0) {
-  //     if (inputGainStage) {
-  //       // Ember.Logger.log('message', inputGainStage);
-  //       // inputGainStage.disconnect(0);
-  //       if (outputGainStage && typeof inputGainStage.connect === 'function') {
-  //         Ember.Logger.log('message', inputGainStage);
-  //         // inputGainStage.connect(outputGainStage);
-  //       }
-  //     }
-  //   } else {
-  //     //chain nodes
-  //   }
-  // })
+  outputChanged: observer('output', 'outputGainStage', function() {
+    this.changeOutput();
+  })
 });
