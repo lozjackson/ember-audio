@@ -1,5 +1,5 @@
 /**
-  @module arms
+  @module ember-audio
 */
 import Ember from 'ember';
 
