@@ -20,10 +20,28 @@ test('busses', function(assert) {
   assert.equal(service.get('busses.length'), 0, `'busses.length' should be 0`);
 });
 
-test('output', function(assert) {
+test('channels', function(assert) {
   var service = this.subject();
-  var output = service.get('audioContext.destination');
-  assert.equal(service.get('output'), output, `'output' should be 'audioContext.destination'`);
+  assert.equal(service.get('channels.length'), 0, `'channels.length' should be 0`);
+});
+
+test('destination', function(assert) {
+  var service = this.subject();
+  var destination = service.get('audioContext.destination');
+  assert.equal(service.get('destination'), destination, `'destination' should be 'audioContext.destination'`);
+});
+
+// test('output', function(assert) {
+//   var service = this.subject();
+//   var output = service.get('audioContext.destination');
+//   assert.equal(service.get('output'), output, `'output' should be 'audioContext.destination'`);
+// });
+
+
+test('checkState method', function(assert) {
+  assert.expect(0);
+  var service = this.subject();
+  service.checkState();
 });
 
 test('createBus method', function(assert) {
@@ -107,6 +125,61 @@ test('busses should not be the same object', function(assert) {
 //   assert.equal(bus1.get('nodes.length'), 2, `'bus1.nodes.length' should be 2`);
 //   assert.equal(bus2.get('nodes.length'), 1, `'bus2.nodes.length' should be 1`);
 // });
+
+test('createChannel method', function(assert) {
+  assert.expect(3);
+  var service = this.subject();
+  assert.equal(service.get('channels.length'), 0, `'channels.length' should be 0`);
+
+  service.createChannel();
+  assert.equal(service.get('channels.length'), 1, `'channels.length' should be 1`);
+
+  service.createChannel();
+  assert.equal(service.get('channels.length'), 2, `'channels.length' should be 2`);
+});
+
+test('addChannel method', function(assert) {
+  assert.expect(3);
+  var service = this.subject();
+  service.set('createChannel', () => assert.ok(true, `'createChannel' method was called`));
+  service.addChannel();
+  service.addChannel(2);
+});
+
+test('channels should be numbered', function(assert) {
+  assert.expect(8);
+  var service = this.subject();
+  assert.equal(service.get('channels.length'), 0, `'channels.length' should be 0`);
+
+  service.addChannel();
+  assert.equal(service.get('channels.length'), 1, `'channels.length' should be 1`);
+  assert.equal(service.get('channels').objectAt(0).get('id'), 1, `'channels[0].id' should be 1`);
+
+  service.addChannel();
+  assert.equal(service.get('channels.length'), 2, `'channels.length' should be 2`);
+  assert.equal(service.get('channels').objectAt(1).get('id'), 2, `'channels[1].id' should be 2`);
+
+  service.addChannel(2);
+  assert.equal(service.get('channels.length'), 4, `'channels.length' should be 4`);
+  assert.equal(service.get('channels').objectAt(2).get('id'), 3, `'channels[2].id' should be 3`);
+  assert.equal(service.get('channels').objectAt(3).get('id'), 4, `'channels[3].id' should be 4`);
+});
+
+test('channels should not be the same object', function(assert) {
+  assert.expect(4);
+  var service = this.subject();
+  assert.equal(service.get('channels.length'), 0, `'channels.length' should be 0`);
+
+  service.addChannel(2);
+  var channel1 = service.get('channels').objectAt(0);
+  var channel2 = service.get('channels').objectAt(1);
+  channel1.set('name', 'One');
+  channel2.set('name', 'Two');
+
+  assert.equal(service.get('channels.length'), 2, `'channels.length' should be 2`);
+  assert.equal(service.get('channels').objectAt(0).get('name'), 'One', `first channel name should be 'One'`);
+  assert.equal(service.get('channels').objectAt(1).get('name'), 'Two', `first channel name should be 'Two'`);
+});
 
 test('createGain method', function(assert) {
   assert.expect(1);

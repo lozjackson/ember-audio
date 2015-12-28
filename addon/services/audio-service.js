@@ -3,6 +3,7 @@
 */
 import Ember from 'ember';
 import AudioBusObject from 'ember-audio/objects/audio-bus';
+import ChannelStrip from 'ember-audio/objects/channel-strip';
 import GainObject from 'ember-audio/objects/gain';
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -37,20 +38,27 @@ export default Ember.Service.extend({
   busses: Ember.A(),
 
   /**
-    ## Output
+    @property channels
+    @type {Array}
+  */
+  channels: Ember.A(),
 
-    The audio output.
+  /**
+    ## Distination
 
-    To connect something the audio output.
+    Alias of `audioContext.destination`
 
-      var source = this.get('source');
-      var output = this.get('output');
-      source.connect( output );
+    The represents the output of the audio system.
 
-    @property output
+      ```
+      var destination = this.get('audioService.destination');
+      source.connectOutput(destination);
+      ```
+
+    @property destination
     @type {Object}
   */
-  output: Ember.computed.alias('audioContext.destination'),
+  destination: Ember.computed.alias('audioContext.destination'),
 
   /**
     Createa a new `AudioContext` object.
@@ -59,14 +67,30 @@ export default Ember.Service.extend({
   */
   init() {
     this._super(...arguments);
-    this.set('busses', Ember.A());
+    this.checkState();
+    this.setProperties({
+      busses: Ember.A(),
+      channels: Ember.A()
+    });
+  },
+
+  /**
+    Checks the state of the `audioContext `object.
+
+    @method checkState
+    @private
+  */
+  checkState() {
     var context = this.get('audioContext');
+    Ember.assert('`audioContext` should not be null', context);
     if ( context && context.state === 'running' ) {
       Ember.Logger.debug(`Ember-audio: ${context.sampleRate / 1000} Khz; Channel count: ${context.destination.channelCount}`);
     }
   },
 
   /**
+    Create a single `AudioBus` object and add it to the `busses` array.
+
     @method createBus
     @private
   */
@@ -80,10 +104,14 @@ export default Ember.Service.extend({
   },
 
   /**
+    ## Add Bus
+
+    Add an audio bus.
+
     @method addBus
     @param {Integer} number The number of busses to add.
   */
-  addBus( number ) {
+  addBus(number) {
     if (typeof number === 'number') {
       for(var i = 0; i < parseInt(number); i++) {
         this.createBus();
@@ -94,15 +122,52 @@ export default Ember.Service.extend({
   },
 
   /**
+    Create a single `ChannelStrip` object and add it to the `channels` array.
 
-    ```
-      var firstBus = this.get('busses').objectAt(0);
-      var output = this.get('output');
+    @method createChannel
+    @private
+  */
+  createChannel() {
+    var channels = this.get('channels');
+    var channel = ChannelStrip.create({
+      audioService: this,
+      id: channels.get('length') + 1
+    });
+    channels.pushObject(channel);
+  },
+
+  /**
+    ## Add Channel
+
+    Add an audio channel.
+
+    @method addChannel
+    @param {Integer} number The number of channels to add.
+  */
+  addChannel(number) {
+    if (typeof number === 'number') {
+      for(var i = 0; i < parseInt(number); i++) {
+        this.createChannel();
+      }
+    } else {
+      this.createChannel();
+    }
+  },
+
+  /**
+
+      ```
       var gain = this.createGain({
-        input: firstBus.bus,
-        output: output
+        input: source,
+        output: destination
       });
-    ```
+
+      // or
+
+      var gain = this.createGain();
+      source.connectOutput(gain);
+      gain.connectOutput(destination);
+      ```
 
     @method createGain
     @param {Object} params
