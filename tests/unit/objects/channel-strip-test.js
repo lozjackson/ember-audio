@@ -1,7 +1,8 @@
+import { module, test } from 'qunit';
+import Ember from 'ember';
 import ChannelStrip from 'ember-audio/objects/channel-strip';
 import GainObject from 'ember-audio/objects/gain';
 import AudioService from 'ember-audio/services/audio-service';
-import { module, test } from 'qunit';
 
 module('Unit | Object | channel strip');
 
@@ -94,6 +95,85 @@ test('audioContext alias', function(assert) {
     }
   });
   assert.equal(subject.get('audioContext.name'), 'audio-context', `'audioContext.name' should be 'audio-context'`);
+});
+
+test('chainNodes method - 0 nodes', function (assert) {
+  assert.expect(2);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  subject.chainNodes();
+});
+
+test('chainNodes method - 1 node', function (assert) {
+  assert.expect(4);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'node', `'node.name' should be 'node'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  subject.set('nodes', Ember.A([
+    {
+      name: 'node',
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    }
+  ]));
+  subject.chainNodes();
+});
+
+test('chainNodes method - 2 nodes', function (assert) {
+  assert.expect(6);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'node1', `'node.name' should be 'node1'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  subject.set('nodes', Ember.A([
+    {
+      name: 'node1',
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'node2', `'node.name' should be 'node2'`);
+      }
+    },
+    {
+      name: 'node2',
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    }
+  ]));
+  subject.chainNodes();
 });
 
 test('createIO method', function(assert) {
