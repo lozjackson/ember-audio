@@ -80,7 +80,7 @@ test('_gain computed property', function (assert) {
 });
 
 test('_gain computed property - inverted polarity', function (assert) {
-  // assert.expect(2);
+  assert.expect(1);
   var AudioBusObject = Ember.Object.extend(AudioBusMixin);
   var subject = AudioBusObject.create({
     audioService: audioService ,
