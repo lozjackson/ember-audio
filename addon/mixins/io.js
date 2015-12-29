@@ -240,9 +240,8 @@ export default Ember.Mixin.create({
   */
   changeInput() {
     var input = this.get('input');
-    var processor = this.get('processor');
-    if (input && processor) {
-      input.connectOutput(processor);
+    if (input) {
+      input.connectOutput(this);
     }
   },
 
@@ -255,5 +254,25 @@ export default Ember.Mixin.create({
     if (output) {
       this.connectOutput(output);
     }
-  }
+  },
+
+  /**
+    If the input changes, connect it to the processor.
+
+    @event inputChanged
+    @private
+  */
+  inputChanged: Ember.observer('input', 'processor', function() {
+    this.changeInput();
+  }),
+
+  /**
+    If the output changes, connect the processor to it.
+
+    @event outputChanged
+    @private
+  */
+  outputChanged: Ember.observer('output', 'processor', function() {
+    this.changeOutput();
+  })
 });

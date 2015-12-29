@@ -358,15 +358,11 @@ test('connectNode method', function(assert) {
       assert.equal(typeof obj, 'object', `typeof 'obj' is an object`);
       assert.equal(obj.id, 1, `'obj.id' is 1`);
       assert.equal(obj.gain.value, 1, `'obj.gain.value' should be 1`);
-    },
-    // disconnect: function () {
-    //   assert.ok(true, `'input.disconnect' method has been called`);
-    // }
+    }
   });
 
   var subject = IoObject.create();
   subject.connectNode(destination.get('processor'));
-  // assert.equal(subject.get('outputs')[0].id, 1, 'outputs[0].id should be 1');
 });
 
 test('disconnectNode method', function(assert) {
@@ -376,12 +372,6 @@ test('disconnectNode method', function(assert) {
   processor.id = 1;
   var IoObject = Ember.Object.extend(IoMixin, {
     outputs: [],
-    // connect: function (obj) {
-    //   assert.ok(true, `'input.connect' method has been called`);
-    //   assert.equal(typeof obj, 'object', `typeof 'obj' is an object`);
-    //   assert.equal(obj.id, 1, `'obj.id' is 1`);
-    //   assert.equal(obj.gain.value, 1, `'obj.gain.value' should be 1`);
-    // },
     disconnect: function (obj) {
       assert.ok(true, `'input.disconnect' method has been called`);
       assert.equal(typeof obj, 'object', `typeof 'obj' is an object`);
@@ -392,55 +382,62 @@ test('disconnectNode method', function(assert) {
 
   var subject = IoObject.create();
   subject.disconnectNode(destination.get('processor'));
-  // assert.equal(subject.get('outputs')[0].id, 1, 'outputs[0].id should be 1');
 });
 
-// test('changeInput method', function (assert) {
-//   assert.expect(3);
-//   var input = {
-//     connect: function () {
-//       assert.ok(true, `'input.connect' method has been called`);
-//       // assert.equal(obj.name, 'processor', `input is connected to processor`);
-//     },
-//     disconnect: function () {
-//       assert.ok(true, `'input.disconnect' method has been called`);
-//       // assert.equal(obj, 0, `input is disconnected`);
-//     }
-//   };
+// test('bypassProcessor method', function(assert) {
+//   assert.expect(5);
+//   var source = audioService.createGain({name: 'source'});
+//   var destination = audioService.createGain({id:1});
+//   var processor = destination.get('processor');
+//   processor.id = 2;
+//
+//   var bypassNode = {
+//       name: 'bypassNode',
+//       connect: function (node) {
+//         assert.ok(true, `'connect' method has been called`);
+//         assert.equal(node.get('name'), 'destination', `'node.name' should be 'destination'`);
+//       },
+//     };
 //
 //   var IoObject = Ember.Object.extend(IoMixin, {
-//     input: input,
-//     processor: {}
+//     outputs: [],
+//     bypassNode: bypassNode,
+//     processor: audioService.get('audioContext').createGain(),
+//     inputChanged: Ember.observer('input', 'processor', function() {
+//       this.changeInput();
+//     })
 //   });
 //
 //   var subject = IoObject.create();
-//   subject.changeInput();
-//   assert.ok(subject);
+//   // source.connectOutput(subject);
+//   subject.set('input', source);
+//   subject.connectOutput(destination);
+//
+//   source.set('connectOutput', (node) => {
+//     assert.ok(true, `'connectOutput' method has been called`);
+//     assert.equal(node.name, 'bypassNode', `'node.name' should be 'bypassNode'`);
+//   });
+//
+//   assert.equal(subject.get('outputs')[0].get('id'), 1, 'outputs[0].id should be 1');
+//
+//   subject.bypassProcessor(true);
 // });
 
 test('changeInput method', function (assert) {
   assert.expect(3);
-
   var input = audioService.createGain({id:1});
-  var gain = audioService.createGain({id:2});
-  input.set('connectOutput', (obj) => {
-    assert.ok(true, `'connectOutput' method has been called`);
-    // Ember.Logger.log('obj', obj);
-    assert.equal(obj.get('processor.gain.value'), 1, `'obj.gain.value' should be 1`);
-    // assert.equal(obj.get('id'), 1, `obj.id should be 1`);
-  });
-  // var ChannelStripObject = ChannelStrip.extend({
-  //   output: output,
-  //   connectOutput: function (obj) {
-  //     assert.ok(true, `'connectOutput' method has been called`);
-  //     assert.equal(obj.get('id'), 1, `obj.id should be 1`);
-  //   }
-  // });
+  var gain = audioService.get('audioContext').createGain({id:2});
   var IoObject = Ember.Object.extend(IoMixin);
   var subject = IoObject.create({
     input: input
   });
   subject.set('processor', gain);
+
+  input.set('connectOutput', (obj) => {
+    assert.ok(true, `'connectOutput' method has been called`);
+    assert.equal(obj.get('processor.gain.value'), 1, `'obj.gain.value' should be 1`);
+  });
+
   subject.changeInput();
   assert.ok(subject);
 });
