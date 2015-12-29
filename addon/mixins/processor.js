@@ -51,7 +51,6 @@ export default Ember.Mixin.create({
   init() {
     this._super(...arguments);
     var processor = this.createProcessor();
-    // this.set('outputs', []);
     if (processor) {
       this.set('processor', processor);
       this.connectProcessor(processor);
