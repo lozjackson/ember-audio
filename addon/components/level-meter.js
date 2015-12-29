@@ -2,14 +2,18 @@
   @module ember-audio
 */
 import Ember from 'ember';
-import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
+import io from 'ember-audio/mixins/io';
+import ProcessorMixin from 'ember-audio/mixins/processor';
 
 /**
+  ## Level Meter Component
+
   @class LevelMeterComponent
   @namespace EmberAudio
-  @uses EmberAudio.ProcessorIoMixin
+  @uses EmberAudio.IoMixin
+  @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Component.extend( ProcessorIoMixin, {
+export default Ember.Component.extend(io, ProcessorMixin, {
 
   tagName: 'canvas',
 
@@ -39,7 +43,7 @@ export default Ember.Component.extend( ProcessorIoMixin, {
   */
   connectProcessor(processor) {
     var input = this.get('input');
-    var output = this.get('output') || this.get('audioService.output');
+    var output = this.get('output') || this.get('audioService.destination');
     if ( input ){
       input.connect(processor);
     }
@@ -54,7 +58,7 @@ export default Ember.Component.extend( ProcessorIoMixin, {
     @method outputChanged
   */
   ouputChanged: Ember.observer('output', 'processor', function() {
-    var output = this.get('output') || this.get('audioService.output');
+    var output = this.get('output') || this.get('audioService.destination');
     var processor = this.get('processor');
     if ( output && processor ) {
       processor.connect(output);
