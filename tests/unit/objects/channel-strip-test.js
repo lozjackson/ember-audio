@@ -13,6 +13,11 @@ test('it works', function(assert) {
   assert.ok(subject);
 });
 
+test('bypass should be false', function(assert) {
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('bypass'), false, `'bypass' should be false`);
+});
+
 test('polarity should be true', function(assert) {
   assert.expect(1);
   var subject = ChannelStrip.create({ audioService: audioService });
@@ -97,6 +102,69 @@ test('audioContext alias', function(assert) {
   assert.equal(subject.get('audioContext.name'), 'audio-context', `'audioContext.name' should be 'audio-context'`);
 });
 
+test('bypassNodes method true', function (assert) {
+  assert.expect(2);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  subject.bypassNodes(true);
+});
+
+test('bypassNodes method false - 0 nodes', function (assert) {
+  assert.expect(2);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  subject.bypassNodes(false);
+});
+
+test('bypassNodes method false - 1 node', function (assert) {
+  assert.expect(4);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'node', `'node.name' should be 'node'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  subject.set('nodes', Ember.A([
+    {
+      name: 'node',
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    }
+  ]));
+  subject.bypassNodes(false);
+});
+
 test('chainNodes method - 0 nodes', function (assert) {
   assert.expect(2);
   var ChannelStripObject = ChannelStrip.extend({
@@ -113,6 +181,19 @@ test('chainNodes method - 0 nodes', function (assert) {
   });
   var subject = ChannelStripObject.create({ audioService: audioService });
   subject.chainNodes();
+});
+
+test('chainNodes method - 0 nodes, calls bypassNodes method', function (assert) {
+  assert.expect(3);
+  var ChannelStripObject = ChannelStrip.extend({
+    bypassNodes: (bypass) => {
+      assert.ok(true, `'bypassNodes' method has been called`);
+      assert.ok(bypass, `'bypass' should be true`);
+    }
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  // subject.chainNodes();
+  assert.ok(subject);
 });
 
 test('chainNodes method - 1 node', function (assert) {
@@ -235,7 +316,6 @@ test('add input Gain Stage', function(assert) {
 test('add output Gain Stage', function(assert) {
   var subject = ChannelStrip.create({ audioService: audioService });
   assert.equal(subject.get('outputGainStage.processor.gain.value'), 1, `'outputGainStage.processor.gain.value' should be 1`);
-  // assert.equal(subject.get('outputGainStage.processor.gain.value'), 1, `'outputGainStage.processor.gain.value' should be 1`);
 });
 
 test('connect method', function(assert) {
@@ -337,47 +417,14 @@ test('connectOutput method does not disconnect other outputs', function(assert) 
   assert.equal(subject.get('outputs')[2].id, 3, 'outputs[2].id should be 3');
 });
 
-// test('changeInput method', function (assert) {
-//   assert.expect(3);
-//   var input = audioService.createGain({id:1});
-//   input.setProperties({
-//     connect: function () {
-//       assert.ok(true, `'input.connect' method has been called`);
-//       // assert.equal(obj.name, 'processor', `input is connected to processor`);
-//     },
-//     disconnect: function () {
-//       assert.ok(true, `'input.disconnect' method has been called`);
-//       // assert.equal(obj, 0, `input is disconnected`);
-//     }
-//   });
-//
-//   var ChannelStripObject = ChannelStrip.extend({
-//     input: input,
-//     inputGainStage: {}
-//   });
-//
-//   var subject = ChannelStripObject.create({ audioService: audioService });
-//   subject.changeInput();
-//   assert.ok(subject);
-// });
-
 test('changeInput method', function (assert) {
   assert.expect(3);
 
   var input = audioService.createGain();
   input.set('connectOutput', (obj) => {
     assert.ok(true, `'connectOutput' method has been called`);
-    // Ember.Logger.log('obj', obj);
     assert.equal(obj.gain.value, 1, `'obj.gain.value' should be 1`);
-    // assert.equal(obj.get('id'), 1, `obj.id should be 1`);
   });
-  // var ChannelStripObject = ChannelStrip.extend({
-  //   output: output,
-  //   connectOutput: function (obj) {
-  //     assert.ok(true, `'connectOutput' method has been called`);
-  //     assert.equal(obj.get('id'), 1, `obj.id should be 1`);
-  //   }
-  // });
   var subject = ChannelStrip.create({
     audioService: audioService,
     input: input
@@ -418,78 +465,6 @@ test('inputChanged observer', function(assert) {
   assert.ok(subject);
 });
 
-// test('inputChanged observer - change input', function(assert) {
-//   assert.expect(1);
-//
-//   var input = audioService.createGain({id:1});
-//
-//   // var input = {
-//   //   connect: function (obj) {
-//   //     assert.ok(true, `'input.connect' method has been called`);
-//   //     assert.equal(obj.get('processor.gain.value'), 1, `'obj.processor.gain.value' should be 1`);
-//   //   },
-//   //   disconnect: function (obj) {
-//   //     assert.ok(true, `'input.disconnect' method has been called`);
-//   //     assert.equal(obj, 0, `input is disconnected`);
-//   //   }
-//   // };
-//
-//   var subject = ChannelStrip.create({ audioService: audioService });
-//   subject.set('input', input);
-//   assert.ok(subject);
-// });
-
-// test('inputChanged observer - change inputGainStage', function(assert) {
-//   // assert.expect(9);
-//
-//   var input = audioService.createGain({id:1});
-//   input.set('connectOutput', (obj) => {
-//     assert.ok(true, `'input.connectOutput' method has been called`);
-//     assert.equal(obj.get('id'), 1, `obj.id should be 1`);
-//   });
-//   // var input = {
-//   //   connect: function (obj) {
-//   //     assert.ok(true, `'input.connect' method has been called`);
-//   //     assert.equal(typeof obj, 'object');
-//   //   },
-//   //   disconnect: function (obj) {
-//   //     assert.ok(true, `'input.disconnect' method has been called`);
-//   //     assert.equal(obj, 0, `input is disconnected`);
-//   //   }
-//   // };
-//
-//   var subject = ChannelStrip.create({ audioService: audioService });
-//   subject.set('input', input);
-//   subject.set('inputGainStage', {
-//     connect: function () {
-//
-//     },
-//     disconnect: function () {}
-//   });
-//   assert.ok(subject);
-// });
-
-// test('outputChanged observer - change output', function(assert) {
-//   assert.expect(3);
-//
-//   var output = audioService.createGain({id:1});
-//
-//   var ChannelStripObject = ChannelStrip.extend({
-//     createOutputGainStage: function () {
-//       this.set('outputGainStage', {
-//         connectOutput: function (obj) {
-//           assert.ok(true, `'outputGainStage.connectOutput' method has been called`);
-//           assert.equal(obj.get('id'), 1, `obj.id should be 1`);
-//         }
-//       });
-//     }
-//   });
-//
-//   var subject = ChannelStripObject.create({ audioService: audioService });
-//   subject.set('output', output);
-//   assert.ok(subject);
-// });
-
 test('outputChanged observer', function(assert) {
   assert.expect(3);
   var output = audioService.createGain({id:1});
@@ -527,40 +502,19 @@ test('removeNode method', function (assert) {
   assert.equal(subject.get('nodes.length'), 1, `'nodes.length' should be 1`);
 });
 
-// test('chain', function (assert) {
-//   assert.expect(1);
-//   // var ChannelStripObject = ChannelStrip.extend({
-//   //   createInputGainStage: function () {
-//   //     this.set('inputGainStage', {
-//   //       connect: function () {
-//   //         assert.ok(true, `'inputGainStage.connect' method has been called`);
-//   //         // assert.equal(obj.name, 'output', `outputGainStage is connected to output`);
-//   //       },
-//   //       disconnect: function () {}
-//   //     });
-//   //   },
-//   //   createOutputGainStage: function () {
-//   //     this.set('outputGainStage', {
-//   //       connect: function () {
-//   //         assert.ok(true, `'outputGainStage.connect' method has been called`);
-//   //         // assert.equal(obj.name, 'output', `outputGainStage is connected to output`);
-//   //       },
-//   //       disconnect: function () {}
-//   //     });
-//   //   }
-//   // });
-//   var subject = ChannelStrip.create({ audioService: audioService });
-//   assert.ok(subject);
-//
-//   var gain1 = GainObject.create({ audioService: audioService });
-//   // Ember.Logger.log('message', gain1);
-//   if (gain1) {
-//     subject.addNode(gain1);
-//   }
-//
-//   // subject.removeNode(gain);
-//
-//   // subject.chainNodes();
-//   // assert.equal(subject.get('inputGainStage.gain'), 1, `'outputGainStage.gain' should be 1`);
-//   // assert.equal(subject.get('outputGainStage.processor.gain.value'), 1, `'outputGainStage.processor.gain.value' should be 1`);
-// });
+test('bypassChanged observer', function(assert) {
+  assert.expect(4);
+  var subject = ChannelStrip.create({ audioService: audioService });
+
+  subject.set('bypassNodes', (bypass) => {
+    assert.ok(`'bypassNodes' method has been called`);
+    assert.equal(bypass, true, `'bypass' should be true`);
+  });
+  subject.set('bypass', true);
+
+  subject.set('bypassNodes', (bypass) => {
+    assert.ok(`'bypassNodes' method has been called`);
+    assert.equal(bypass, false, `'bypass' should be false`);
+  });
+  subject.set('bypass', false);
+});

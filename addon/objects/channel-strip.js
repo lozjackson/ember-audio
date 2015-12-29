@@ -75,6 +75,13 @@ export default Ember.Object.extend(io, {
   nodes: Ember.A(),
 
   /**
+    @property bypass
+    @type {Boolean}
+    @default false
+  */
+  bypass: false,
+
+  /**
     ## polarity
 
     If `true` then the `polarity` is positive. The polarity is applied to the `inputGainStage`
@@ -147,6 +154,23 @@ export default Ember.Object.extend(io, {
   },
 
   /**
+    @method bypassNodes
+    @param {Boolean} bypass
+    @private
+  */
+  bypassNodes(bypass) {
+    const {inputGainStage, outputGainStage, nodes} = this.getProperties('inputGainStage', 'outputGainStage', 'nodes');
+    if (bypass || !nodes.get('length')) {
+      if (inputGainStage && outputGainStage) {
+        inputGainStage.connectOutput(outputGainStage);
+      }
+    } else {
+      inputGainStage.connectOutput(nodes.get('firstObject'));
+      nodes.get('lastObject').connectOutput(outputGainStage);
+    }
+  },
+
+  /**
     @method chainNodes
     @private
   */
@@ -154,9 +178,7 @@ export default Ember.Object.extend(io, {
     var {inputGainStage, outputGainStage, nodes} = this.getProperties('inputGainStage', 'outputGainStage', 'nodes');
     var nodesLength = nodes.get('length');
     if (nodesLength === 0) {
-      if (inputGainStage && outputGainStage) {
-        inputGainStage.connectOutput(outputGainStage);
-      }
+      this.bypassNodes(true);
     } else {
       inputGainStage.connectOutput(nodes.get('firstObject'));
       for (var i = 0; i < nodesLength; i++) {
@@ -264,5 +286,15 @@ export default Ember.Object.extend(io, {
   */
   outputChanged: observer('output', 'outputGainStage', function() {
     this.changeOutput();
+  }),
+
+  /**
+    If the `bypass` changes, bypass the `nodes` array.
+
+    @event bypassChanged
+    @private
+  */
+  bypassChanged: observer('bypass', function() {
+    this.bypassNodes(this.get('bypass'));
   })
 });
