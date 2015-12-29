@@ -28,10 +28,19 @@ export default Ember.Mixin.create({
   output: null,
 
   /**
+    ## Inputs
+
+    @property inputs
+    @type {Array}
+    @private
+  */
+  inputs: Ember.A(),
+
+  /**
     ## Outputs
 
-    This is an array of audioNodes that this object is connected to.  The index
-    is the output number.  Index 0 is the main/default output.
+    This is an array of audioNodes that this object outputs to.  The index is the
+    output number.  Index 0 is the main/default output.
 
     NOTE:  This is used internally to keep track of output connections, you don't
           add to this array directly.  To connect an output use the `connectOutput`
@@ -53,7 +62,10 @@ export default Ember.Mixin.create({
   */
   init() {
     this._super(...arguments);
-    this.set('outputs', []);
+    this.setProperties({
+      inputs: Ember.A(),
+      outputs: []
+    });
   },
 
   /**
@@ -89,6 +101,57 @@ export default Ember.Mixin.create({
   },
 
   /**
+    @method registerInput
+  */
+  registerInput(outputNode, outputNumber) {
+    var inputs = this.get('inputs');
+    if (outputNode) {
+      inputs.pushObject(Ember.Object.create({
+        node: outputNode,
+        output: outputNumber
+      }));
+    }
+  },
+
+  /**
+    ## Unregister Input
+
+    Unregister an input.  The `input` parameter is the source node to unregister.
+
+      ```
+      // this is the input that we want to un-register.
+      var input = this.get('sourceNode');
+
+      object.unregisterInput(input);
+      ```
+
+    NOTE:  This does not disconnect the input, it only un-registers it.  To
+          disconnect an input/output call the source node's `disconnect` method.
+
+    @method unregisterInput
+    @param {Object} input
+  */
+  unregisterInput(input) {
+    var inputs = this.get('inputs');
+    var node = inputs.findBy('node', input);
+    if (node) {
+      inputs.removeObject(node);
+    }
+  },
+
+  /**
+    ## Connect Output
+
+    Connect an output to a destination.
+
+      ```
+      // connect the main output of `source` to `destination`
+      source.connectOutput(destination);
+
+      // connect a second output (output 1) from `source` to `auxBus`.
+      source.connectOutput(auxBus, 1);
+      ```
+
     @method connectOutput
     @param {Object} node
     @param {Integer} output
@@ -100,31 +163,75 @@ export default Ember.Mixin.create({
       output = 0;
     }
     var outputs = this.get('outputs');
-
-    // if there is a node in the outputs array at the index disconnect the node
-    var oldNode = outputs[output];
-    if (oldNode) {
-      this.disconnect(oldNode);
-      outputs[output] = null;
-    }
+    this.disconnectOutput(output);
 
     if (node) {
+      outputs[output] = node; // store the node in the outputs array.
+      this.connectNode(node); // connect to the node
 
-      /*
-        We want the native `audioNode` object, not an `Ember.Object`.  If the
-        `node` passed in is an instance of an `Ember.Object`, and it has a
-        `processor` property then we need to use the `processor` object as the
-        node to connect to.
-      */
-      if (Ember.typeOf(node) === 'instance' && node.get('processor')) {
-        node = node.get('processor');
+      // register the input here
+      if (typeof node.registerInput === 'function') {
+        node.registerInput(this, output);
       }
-
-      // store the node in the outputs array.
-      outputs[output] = node;
-      // connect to the node
-      this.connect(node);
     }
+  },
+
+  /**
+    @method disconnectOutput
+    @param {Integer} output
+  */
+  disconnectOutput(output) {
+    // if the output is not specified, then assume output 0.
+    if (isNaN(output)) {
+      output = 0;
+    }
+    var outputs = this.get('outputs');
+
+    // if there is a node in the outputs array at the index disconnect the node
+    var node = outputs[output];
+    if (node) {
+      this.disconnectNode(node);
+      outputs[output] = null;
+      if (typeof node.unregisterInput === 'function') {
+        node.unregisterInput(this);
+      }
+    }
+  },
+
+  /**
+    @method connectNode
+    @param {Object} node
+    @private
+  */
+  connectNode(node) {
+    /*
+      We want the native `audioNode` object, not an `Ember.Object`.  If the
+      `node` passed in is an instance of an `Ember.Object`, and it has a
+      `processor` property then we need to use the `processor` object as the
+      node to connect to.
+    */
+    if (Ember.typeOf(node) === 'instance' && node.get('processor')) {
+      node = node.get('processor');
+    }
+    this.connect(node);
+  },
+
+  /**
+    @method disconnectNode
+    @param {Object} node
+    @private
+  */
+  disconnectNode(node) {
+    /*
+      We want the native `audioNode` object, not an `Ember.Object`.  If the
+      `node` passed in is an instance of an `Ember.Object`, and it has a
+      `processor` property then we need to use the `processor` object as the
+      node to connect to.
+    */
+    if (Ember.typeOf(node) === 'instance' && node.get('processor')) {
+      node = node.get('processor');
+    }
+    this.disconnect(node);
   },
 
   /**
