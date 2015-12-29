@@ -2,15 +2,15 @@
   @module ember-audio
 */
 import Ember from 'ember';
-import ProcessorIoMixin from 'ember-audio/mixins/processor-io';
+import ProcessorMixin from 'ember-audio/mixins/processor';
 import layout from '../templates/components/audio-filter';
 
 /**
   @class AudioFilterComponent
   @namespace EmberAudio
-  @uses EmberAudio.ProcessorIoMixin
+  @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Component.extend( ProcessorIoMixin, {
+export default Ember.Component.extend( ProcessorMixin, {
 
   layout: layout,
 
@@ -35,6 +35,9 @@ export default Ember.Component.extend( ProcessorIoMixin, {
     var frequency = this.get('frequency');
     var q = this.get('q');
     var gain = this.get('gain');
+    if (!audioContext) {
+      return null;
+    }
     var filter = audioContext.createBiquadFilter();
     filter.type = (typeof filter.type === 'string') ? type : 0;
     filter.frequency.value = frequency;
@@ -57,7 +60,7 @@ export default Ember.Component.extend( ProcessorIoMixin, {
   _q: Ember.computed('q', 'processor', {
     get() {
       var filter = this.get('processor');
-      return filter.Q.value
+      return filter.Q.value;
     },
     set( key, value ) {
       var filter = this.get('processor');
@@ -68,7 +71,7 @@ export default Ember.Component.extend( ProcessorIoMixin, {
   _gain: Ember.computed('gain', 'processor', {
     get() {
       var filter = this.get('processor');
-      return filter.gain.value
+      return filter.gain.value;
     },
     set( key, value ) {
       var filter = this.get('processor');
