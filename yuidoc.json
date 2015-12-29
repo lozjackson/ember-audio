@@ -1,0 +1,12 @@
+{
+  "name": "ember-audio",
+  "description": "Audio tools for ember applications.",
+  "url": "https://github.com/lozjackson/ember-audio",
+  "options": {
+    "paths": [
+      "app"
+    ],
+    "exclude": "vendor",
+    "outdir":   "docs"
+  }
+}
