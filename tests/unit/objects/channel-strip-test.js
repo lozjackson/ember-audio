@@ -12,6 +12,80 @@ test('it works', function(assert) {
   assert.ok(subject);
 });
 
+test('polarity should be true', function(assert) {
+  assert.expect(1);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('polarity'), true, `'polarity' should be true`);
+});
+
+test('polarity should be the same as inputGainStage.polarity', function(assert) {
+  assert.expect(5);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('polarity'), subject.get('inputGainStage.polarity'), `'polarity' should be 'inputGainStage.polarity'`);
+
+  subject.set('polarity', true);
+  assert.equal(subject.get('polarity'), true, `'polarity' should be true`);
+  assert.equal(subject.get('inputGainStage.polarity'), true, `'polarity' should be true`);
+
+  subject.set('polarity', false);
+  assert.equal(subject.get('polarity'), false, `'polarity' should be false`);
+  assert.equal(subject.get('inputGainStage.polarity'), false, `'polarity' should be false`);
+});
+
+test('mute should be false', function(assert) {
+  assert.expect(1);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('mute'), false, `'mute' should be false`);
+});
+
+test('mute should be the same as outputGainStage.mute', function(assert) {
+  assert.expect(5);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('mute'), subject.get('outputGainStage.mute'), `'mute' should be 'outputGainStage.mute'`);
+
+  subject.set('mute', true);
+  assert.equal(subject.get('polarity'), true, `'polarity' should be true`);
+  assert.equal(subject.get('inputGainStage.polarity'), true, `'polarity' should be true`);
+
+  subject.set('mute', false);
+  assert.equal(subject.get('mute'), false, `'mute' should be false`);
+  assert.equal(subject.get('inputGainStage.mute'), false, `'mute' should be false`);
+});
+
+test('inputGain should be 1', function(assert) {
+  assert.expect(1);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('inputGain'), 1, `'inputGain' should be 1`);
+});
+
+test('inputGain should be the same as inputGainStage.gain', function(assert) {
+  assert.expect(5);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('inputGain'), subject.get('inputGainStage.gain'), `'inputGain' should be 'inputGainStage.gain'`);
+
+  subject.set('inputGain', 0.5);
+  assert.equal(subject.get('inputGain'), 0.5, `'inputGain' should be 0.5`);
+  assert.equal(subject.get('inputGainStage.gain'), 0.5, `'inputGainStage.gain' should be 0.5`);
+
+  subject.set('inputGain', 0);
+  assert.equal(subject.get('inputGain'), 0, `'inputGain' should be 0`);
+  assert.equal(subject.get('inputGainStage.gain'), 0, `'inputGainStage.gain' should be 0`);
+});
+
+test('outputGain should be the same as outputGainStage.gain', function(assert) {
+  assert.expect(5);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  assert.equal(subject.get('outputGain'), subject.get('outputGainStage.gain'), `'inputGain' should be 'inputGainStage.gain'`);
+
+  subject.set('outputGain', 0.5);
+  assert.equal(subject.get('outputGain'), 0.5, `'outputGain' should be 0.5`);
+  assert.equal(subject.get('outputGainStage.gain'), 0.5, `'outputGainStage.gain' should be 0.5`);
+
+  subject.set('outputGain', 0);
+  assert.equal(subject.get('outputGain'), 0, `'outputGain' should be 0`);
+  assert.equal(subject.get('outputGainStage.gain'), 0, `'outputGainStage.gain' should be 0`);
+});
+
 test('audioContext alias', function(assert) {
   var subject = ChannelStrip.create({
     audioService: {
@@ -22,19 +96,60 @@ test('audioContext alias', function(assert) {
   assert.equal(subject.get('audioContext.name'), 'audio-context', `'audioContext.name' should be 'audio-context'`);
 });
 
-test('createGain', function(assert) {
+test('createIO method', function(assert) {
+  assert.expect(3);
   var subject = ChannelStrip.create({ audioService: audioService });
-  // assert.equal(subject.get('nodes.length'), 0, `'nodes.length' should be 0`);
+  subject.setProperties({
+    createInputGainStage: () => assert.ok(true, `'createInputGainStage' method has been called`),
+    createOutputGainStage: () => assert.ok(true, `'createOutputGainStage' method has been called`),
+    chainNodes: () => assert.ok(true, `'chainNodes' method has been called`)
+  });
+  subject.createIO();
+});
 
+test('createIO method is called on init', function(assert) {
+  assert.expect(2);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => assert.ok(true, `'createIO' method has been called`)
+  });
+  var subject = ChannelStripObject.create({ audioService: audioService });
+  assert.ok(subject);
+});
+
+test('createInputGainStage method', function(assert) {
+  assert.expect(2);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  subject.set('createGain', () => {
+    assert.ok(true, `'createGain' method has been called`);
+    return {id:1};
+  });
+  subject.createInputGainStage();
+  assert.equal(subject.get('inputGainStage.id'), 1, `'inputGainStage.id' should be 1`);
+});
+
+test('createOutputGainStage method', function(assert) {
+  assert.expect(2);
+  var subject = ChannelStrip.create({ audioService: audioService });
+  subject.set('createGain', () => {
+    assert.ok(true, `'createGain' method has been called`);
+    return {id:1};
+  });
+  subject.createOutputGainStage();
+  assert.equal(subject.get('outputGainStage.id'), 1, `'outputGainStage.id' should be 1`);
+});
+
+test('createGain', function(assert) {
+  assert.expect(2);
+  var subject = ChannelStrip.create({ audioService: audioService });
   var gainObject = subject.createGain();
   assert.equal(typeof gainObject, 'object', `'gainObject' should be an object`);
   assert.equal(gainObject.get('processor.gain.value'), 1, `'gainObject.processor.gain.value' should be 1`);
 });
 
 test('add input Gain Stage', function(assert) {
+  assert.expect(1);
   var subject = ChannelStrip.create({ audioService: audioService });
   assert.equal(subject.get('inputGainStage.processor.gain.value'), 1, `'inputGainStage.processor.gain.value' should be 1`);
-  // assert.equal(subject.get('inputGainStage.processor.gain.value'), 1, `'inputGainStage.processor.gain.value' should be 1`);
 });
 
 test('add output Gain Stage', function(assert) {

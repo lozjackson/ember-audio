@@ -75,6 +75,47 @@ export default Ember.Object.extend(io, {
   nodes: Ember.A(),
 
   /**
+    ## polarity
+
+    If `true` then the `polarity` is positive. The polarity is applied to the `inputGainStage`
+
+    @property polarity
+    @type {Boolean}
+  */
+  polarity: alias('inputGainStage.polarity'),
+
+  /**
+    ## mute
+
+    If `true` then the audio will be muted - no audio output from the `outputGainStage`.
+    Mute will be applied to the `outputGainStage`.
+
+    @property mute
+    @type {Boolean}
+  */
+  mute: alias('outputGainStage.mute'),
+
+  /**
+    ## inputGain
+
+    This is the gain for the `inputGainStage`..  A value of `1` is full volume.  0 is no output.
+
+    @property inputGain
+    @type {Number}
+  */
+  inputGain: alias('inputGainStage.gain'),
+
+  /**
+    ## outputGain
+
+    This is the gain for the `outputGainStage`..  A value of `1` is full volume.  0 is no output.
+
+    @property outputGain
+    @type {Number}
+  */
+  outputGain: alias('outputGainStage.gain'),
+
+  /**
     Alias of `audioService.audioContext`
 
     @property audioContext
@@ -114,20 +155,20 @@ export default Ember.Object.extend(io, {
     var nodesLength = nodes.get('length');
     if (nodesLength === 0) {
       if (inputGainStage && outputGainStage) {
-        inputGainStage.connectOutput(outputGainStage.get('processor'));
+        inputGainStage.connectOutput(outputGainStage);
       }
     } else {
-      inputGainStage.connectOutput(nodes.get('firstObject').get('processor'));
+      inputGainStage.connectOutput(nodes.get('firstObject'));
       for (var i = 0; i < nodesLength; i++) {
         var nextNodeIndex = i + 1;
         if (nextNodeIndex < nodesLength) {
           var nextNode = nodes[nextNodeIndex];
           if (nextNode) {
-            nodes[i].connectOutput(nextNode.get('processor'));
+            nodes[i].connectOutput(nextNode);
           }
         }
       }
-      nodes.get('lastObject').connectOutput(outputGainStage.get('processor'));
+      nodes.get('lastObject').connectOutput(outputGainStage);
     }
   },
 
@@ -150,7 +191,7 @@ export default Ember.Object.extend(io, {
   },
 
   /**
-    @method createInputGainStage
+    @method createOutputGainStage
     @private
   */
   createOutputGainStage() {
