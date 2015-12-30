@@ -1,11 +1,11 @@
+import { module, test } from 'qunit';
 import Ember from 'ember';
 import IoMixin from '../../../mixins/io';
 import AudioService from 'ember-audio/services/audio-service';
-import { module, test } from 'qunit';
-
-module('Unit | Mixin | io');
 
 var audioService = AudioService.create();
+
+module('Unit | Mixin | io');
 
 test('it works', function(assert) {
   var IoObject = Ember.Object.extend(IoMixin);
@@ -163,6 +163,26 @@ test('disconnectOutput method calls unregisterInput', function(assert) {
 
   subject.connectOutput(destination);
   subject.disconnectOutput(destination);
+});
+
+test('connectInput method calls connectOutput of source', function(assert) {
+  assert.expect(3);
+  var source = audioService.createGain({name: 'source'});
+  source.set('connectNode', (obj) => {
+    assert.ok(true, `'source.connectMethod' method has been called`);
+    assert.equal(typeof obj, 'object', `typeof 'obj' is an object`);
+    assert.equal(obj.get('name'), 'IoObject', `'obj.name' is 'IoObject'`);
+  });
+  var destination = audioService.createGain({id:1});
+  var processor = destination.get('processor');
+  processor.id = 2;
+  var IoObject = Ember.Object.extend(IoMixin, {
+    name: 'IoObject',
+    outputs: []
+  });
+
+  var subject = IoObject.create();
+  subject.connectInput(source);
 });
 
 test('connectOutput method does not break when audioNode is passed in', function(assert) {

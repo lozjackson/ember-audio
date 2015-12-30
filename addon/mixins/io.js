@@ -140,6 +140,37 @@ export default Ember.Mixin.create({
   },
 
   /**
+    ## Connect Input
+
+    Connect `source` to an input.  This method calls `source.connectOutput` - It
+    connects a specified output from `source` to `this`.
+
+    You can specify an output to use from `source` (inputs don't have numbers).
+
+    ```
+    // connect the main output of `source` to `this`
+    this.connectInput(source);
+    ```
+
+    If you want to use an output other than 0, then specify it as the second
+    parameter.
+
+    ```
+    // connect output 1 from `source` to `this`.
+    this.connectInput(source, 1);
+    ```
+
+    @method connectInput
+    @param {Object} source
+    @param {Integer} outputNumber
+  */
+  connectInput(source, outputNumber) {
+    if (source && typeof source.connectOutput === 'function') {
+      source.connectOutput(this, outputNumber);
+    }
+  },
+
+  /**
     ## Connect Output
 
     Connect an output to a destination.
@@ -239,10 +270,7 @@ export default Ember.Mixin.create({
     @private
   */
   changeInput() {
-    var input = this.get('input');
-    if (input) {
-      input.connectOutput(this);
-    }
+    this.connectInput(this.get('input'));
   },
 
   /**
@@ -250,10 +278,7 @@ export default Ember.Mixin.create({
     @private
   */
   changeOutput() {
-    var output = this.get('output');
-    if (output) {
-      this.connectOutput(output);
-    }
+    this.connectOutput(this.get('output'));
   },
 
   /**
