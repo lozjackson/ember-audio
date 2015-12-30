@@ -7,7 +7,7 @@ import Ember from 'ember';
   This mixin provides an `input` and `output` and methods for connecting to other objects.
 
   @class IoMixin
-  @namespace Arms
+  @namespace Mixins
 */
 export default Ember.Mixin.create({
 

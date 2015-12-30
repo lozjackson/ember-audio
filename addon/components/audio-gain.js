@@ -13,7 +13,7 @@ import layout from '../templates/components/audio-gain';
   gain being applied.  A `gain` value of `0` will produce no output.
 
   @class AudioGainComponent
-  @namespace EmberAudio
+  @namespace Components
   @uses EmberAudio.ProcessorMixin
 */
 export default Ember.Component.extend( /*ProcessorMixin,*/{

@@ -9,7 +9,7 @@ import layout from '../templates/components/audio-bus';
   ## AudioBusComponent
 
   @class AudioBusComponent
-  @namespace EmberAudio
+  @namespace Components
   @uses EmberAudio.AudioBusMixin
 */
 export default Ember.Component.extend( AudioBusMixin, {

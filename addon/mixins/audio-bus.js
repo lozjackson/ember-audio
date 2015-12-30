@@ -12,7 +12,7 @@ var observer = Ember.observer;
   ## AudioBusMixin
 
   @class AudioBusMixin
-  @namespace EmberAudio
+  @namespace Mixins
 */
 export default Ember.Mixin.create({
 

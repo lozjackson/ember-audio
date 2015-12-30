@@ -16,7 +16,7 @@ const observer = Ember.observer;
   gain being applied.  A `gain` value of `0` will produce no output.
 
   @class GainObject
-  @namespace EmberAudio
+  @namespace Objects
   @uses EmberAudio.IoMixin
   @uses EmberAudio.ProcessorMixin
 */

@@ -9,7 +9,7 @@ var alias = Ember.computed.alias;
   This mixin provides properties and methods for the i/o of the processing node.
 
   @class ProcessorMixin
-  @namespace EmberAudio
+  @namespace Mixins
 */
 export default Ember.Mixin.create({
 
