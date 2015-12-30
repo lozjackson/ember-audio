@@ -6,7 +6,13 @@ import Ember from 'ember';
 var alias = Ember.computed.alias;
 
 /**
-  This mixin provides properties and methods for the i/o of the processing node.
+  ## Processor Mixin
+
+  Processor Objects should include this mixin.
+
+  NOTE:  This mixin relies on properties and methods provided by the `IoMixin`.
+         Therefore any classes that include this mixin should also include the
+         `IoMixin`.
 
   @class ProcessorMixin
   @namespace Mixins
@@ -53,7 +59,7 @@ export default Ember.Mixin.create({
     var processor = this.createProcessor();
     if (processor) {
       this.set('processor', processor);
-      this.connectProcessor(processor);
+      this.connectProcessor();
     }
   },
 
@@ -66,16 +72,13 @@ export default Ember.Mixin.create({
     @param {Object} processor
     @private
   */
-  connectProcessor(processor) {
-    var input = this.get('input');
-    var output = this.get('output');
-    if (processor) {
-      if (input){
-        input.connectOutput(processor);
-      }
-      if (output) {
-        this.connectOutput(output);
-      }
+  connectProcessor() {
+    var {input, output} = this.getProperties('input', 'output');
+    if (typeof this.connectOutput !== 'function' || typeof this.connectInput !== 'function') {
+      Ember.Logger.warn(`The 'ProcessorMixin' relies on properties and methods provided by the 'IoMixin'.`);
+    } else {
+      this.connectInput(input);
+      this.connectOutput(output);
     }
   }
 });
