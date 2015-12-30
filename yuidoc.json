@@ -4,7 +4,7 @@
   "url": "https://github.com/lozjackson/ember-audio",
   "options": {
     "paths": [
-      "app"
+      "addon"
     ],
     "exclude": "vendor",
     "outdir":   "docs"

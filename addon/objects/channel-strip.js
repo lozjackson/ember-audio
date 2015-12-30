@@ -15,7 +15,7 @@ var observer = Ember.observer;
   output of the channel strip.
 
   @class ChannelStripObject
-  @namespace EmberAudio
+  @namespace Objects
   @uses EmberAudio.IoMixin
 */
 export default Ember.Object.extend(io, {
@@ -60,7 +60,7 @@ export default Ember.Object.extend(io, {
     This is a Gain Object and is the last node in the processing chain.  It sets
     the output gain of the channel strip.
 
-    @property inputGainStage
+    @property outputGainStage
     @type {Object}
   */
   outputGainStage: null,

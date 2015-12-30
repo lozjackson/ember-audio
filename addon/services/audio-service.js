@@ -17,7 +17,7 @@ var audioContext = new AudioContext();
   audio output.
 
   @class AudioService
-  @namespace EmberAudio
+  @namespace Services
 */
 export default Ember.Service.extend({
 
@@ -26,7 +26,7 @@ export default Ember.Service.extend({
 
     The `AudioContext` object.
 
-    @property audioService
+    @property audioContext
     @type {Object}
   */
   audioContext: audioContext,
@@ -64,6 +64,7 @@ export default Ember.Service.extend({
     Createa a new `AudioContext` object.
 
     @method init
+    @private
   */
   init() {
     this._super(...arguments);

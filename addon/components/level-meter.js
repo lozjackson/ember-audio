@@ -9,7 +9,7 @@ import ProcessorMixin from 'ember-audio/mixins/processor';
   ## Level Meter Component
 
   @class LevelMeterComponent
-  @namespace EmberAudio
+  @namespace Components
   @uses EmberAudio.IoMixin
   @uses EmberAudio.ProcessorMixin
 */

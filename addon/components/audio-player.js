@@ -8,7 +8,7 @@ import layout from '../templates/components/audio-player';
   This component is rendered with the `<audio>` tag.
 
   @class AudioPlayerComponent
-  @namespace EmberAudio
+  @namespace Components
 */
 export default Ember.Component.extend({
   layout: layout,

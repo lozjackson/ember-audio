@@ -8,7 +8,7 @@ import AudioBusMixin from 'ember-audio/mixins/audio-bus';
   ## AudioBusObject
 
   @class AudioBusObject
-  @namespace EmberAudio
+  @namespace Objects
   @uses EmberAudio.AudioBusMixin
 */
 export default Ember.Object.extend( AudioBusMixin, {

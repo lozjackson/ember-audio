@@ -7,7 +7,7 @@ import layout from '../templates/components/audio-filter';
 
 /**
   @class AudioFilterComponent
-  @namespace EmberAudio
+  @namespace Components
   @uses EmberAudio.ProcessorMixin
 */
 export default Ember.Component.extend( ProcessorMixin, {
