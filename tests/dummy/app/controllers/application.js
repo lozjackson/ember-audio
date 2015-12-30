@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-var c = [false, false];
+// var c = [false, false];
 
 export default Ember.Controller.extend({
 
