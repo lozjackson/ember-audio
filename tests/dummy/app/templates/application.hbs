@@ -1,53 +1,19 @@
 <h2 id="title">ember-audio</h2>
-{{audio-player src="assets/test.mp3"}}
 
-<div>
-  {{#patch-bay as |bus|}}
-    {{audio-player id="player1" src="assets/test.mp3" output=bus}}
-  {{/patch-bay}}
-</div>
-
-
-<div style="display:inline-block; border: 1px solid black;">
-  <h3>BUS 1</h3>
-  {{#audio-filter input=bus1 type="highpass" frequency="40" as |filter|}}
-    <button {{action "invertPolarity" 0}}>POLARITY</button>
-    {{#audio-gain input=filter gain="1" output=output as |amp|}}
-      {{level-meter input=amp}}
-    {{/audio-gain}}
-  {{/audio-filter}}
-</div>
-
-
-<div style="display:inline-block; border: 1px solid black;">
-  <h3>BUS 2</h3>
-
-  {{#audio-filter input=bus2 type="highpass" as |filter|}}
-    <button {{action "invertPolarity" 1}}>POLARITY</button>
-    {{#audio-gain input=filter gain="1" output=output as |amp|}}
-      {{level-meter input=amp}}
-    {{/audio-gain}}
-  {{/audio-filter}}
-</div>
-
-{{!tone-generator output=output}}
-
-{{#tone-generator as |src|}}
-  <button {{action "activateBus" src 0}}>BUS 1</button>
-  <button {{action "activateBus" src 1}}>BUS 2</button>
-  {{#audio-filter input=src as |filter|}}
-    {{level-meter input=filter}}
-    {{#audio-gain input=filter output=output as |amp|}}
-      {{level-meter input=amp}}
-    {{/audio-gain}}
-  {{/audio-filter}}
-{{/tone-generator}}
-
-{{#audio-bus as |aux|}}
-  {{audio-player src="assets/test.mp3" output=aux}}
-  {{#audio-filter input=aux output=output as |filter|}}
-    {{level-meter input=filter}}
-  {{/audio-filter}}
-{{/audio-bus}}
-
+{{audio-player src="assets/test.mp3" output=bus1.input}}
+{{audio-player src="assets/test.mp3" output=bus2.input}}
+<ul>
+  <li>
+    {{#link-to 'index'}}Index{{/link-to}}
+  </li>
+  <li>
+    {{#link-to 'audio-player'}}Audio player{{/link-to}}
+  </li>
+  <li>
+    {{#link-to 'tone-generator'}}Tone generator{{/link-to}}
+  </li>
+  <li>
+    {{#link-to 'channel-strip'}}Channel Strip{{/link-to}}
+  </li>
+</ul>
 {{outlet}}

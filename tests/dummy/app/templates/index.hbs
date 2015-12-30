@@ -1,0 +1,32 @@
+
+{{!audio-gain input=audioService.busses.firstObject.bus output=audioService.output}}
+
+{{!input type="range" min=gainNode.min max=gainNode.max step="0.001" value=gainNode.gain}}
+
+{{!level-meter input=gainNode.processor}}
+
+{{#each audioService.busses as |bus|}}
+  {{!level-meter input=bus.nodes.firstObject.node}}
+  <div style="display:inline-block;">
+      <div>{{level-meter input=bus.bus}}</div>
+      {{!bus.test}}
+      {{!log 'bus' bus.nodes}}
+    {{!input
+      type="range"
+      min=bus.nodes.firstObject.node.min
+      max=bus.nodes.firstObject.node.max step="0.001"
+      value=bus.nodes.firstObject.node.gain}}
+      <div>{{bus.nodes.length}}</div>
+      {{#each bus.nodes as |node|}}
+        <div>{{input
+          type="range"
+          min=node.min
+          max=node.max step="0.001"
+          value=node.gain}}</div>
+        <div>{{level-meter input=node.processor}}</div>
+      {{/each}}
+    <div>{{!level-meter input=bus.nodes.firstObject.node.processor}}</div>
+  </div>
+{{/each}}
+
+{{!level-meter input=audioService.output}}

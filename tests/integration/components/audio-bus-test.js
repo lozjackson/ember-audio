@@ -6,21 +6,21 @@ moduleForComponent('audio-bus', 'Integration | Component | audio bus', {
 });
 
 test('it renders', function(assert) {
-  assert.expect(2);
+  assert.expect(1);
 
   // Set any properties with this.set('myProperty', 'value');
   // Handle any actions with this.on('myAction', function(val) { ... });
 
   this.render(hbs`{{audio-bus}}`);
 
-  assert.equal(this.$().text().trim(), '');
+  assert.equal(this.$('div').length, 1);
 
   // Template block usage:
-  this.render(hbs`
-    {{#audio-bus}}
-      template block text
-    {{/audio-bus}}
-  `);
+  // this.render(hbs`
+  //   {{#audio-bus}}
+  //     template block text
+  //   {{/audio-bus}}
+  // `);
 
-  assert.equal(this.$().text().trim(), 'template block text');
+  // assert.equal(this.$().text().trim(), 'template block text');
 });

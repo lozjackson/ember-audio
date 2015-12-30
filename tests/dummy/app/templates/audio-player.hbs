@@ -1,0 +1,30 @@
+<h2>Audio-player</h2>
+
+<div>
+  {{#patch-bay as |bus|}}
+    {{audio-player id="player1" src="assets/test.mp3" output=bus}}
+  {{/patch-bay}}
+</div>
+
+{{audio-player src="assets/test.mp3"}}
+
+<div style="display:inline-block; border: 1px solid black;">
+  <h3>BUS 1</h3>
+  {{#audio-filter input=bus1 type="highpass" frequency="40" as |filter|}}
+    <button {{action "invertPolarity" 0}}>POLARITY</button>
+    {{#audio-gain input=filter output=output as |amp|}}
+      {{level-meter input=amp}}
+    {{/audio-gain}}
+  {{/audio-filter}}
+</div>
+
+<div style="display:inline-block; border: 1px solid black;">
+  <h3>BUS 2</h3>
+
+  {{#audio-filter input=bus2 type="highpass" as |filter|}}
+    <button {{action "invertPolarity" 1}}>POLARITY</button>
+    {{#audio-gain input=filter output=output as |amp|}}
+      {{level-meter input=amp}}
+    {{/audio-gain}}
+  {{/audio-filter}}
+</div>
