@@ -12,9 +12,59 @@ var audioContext = new AudioContext();
 /**
   ## Audio Service
 
-  This is the `audioService` service.  It represents the audio system and gives
+  This is the `audioService`.  It represents the audio system and gives
   us acces to the `AudioContext` object which among other things provides the
   audio output.
+
+  The `audioService` has an array of `channels` and `busses`.  Channels can be
+  used for processing audio streams, and busses for routing and summing.
+
+  ### Channels
+
+  To create a new channel you create a `ChannelStripObject` and add it to the
+  `channels` array - This can be done easily with the `addChannel` method.
+
+  ```
+  // add 1 channel
+  audioService.addChannel();
+
+  // add 24 channels
+  audioService.addChannel(24);
+  ```
+
+  Channel strips can then be accessed by looking up the channel in the `channels`
+  array.  The array is indexed from 0 - You can use the `objectAt` method to find
+  a channel using the index.
+
+  ```
+  var channels = audioService.get('channels');
+  var ch1 = channels.objectAt(0);
+  var ch6 = channels.objectAt(5);
+  ```
+
+  ### Busses
+
+  Busses can be created in a similar way to channels.  You create an `AudioBusObject`
+  and add it to the `busses` array  - This can be done easily with the `addBus`
+  method.
+
+  ```
+  // add 1 bus
+  audioService.addBus();
+
+  // add 24 busses
+  audioService.addBus(24);
+  ```
+
+  Busses can then be accessed by looking up the bus in the `busses` array.  The
+  array is indexed from 0 - You can use the `objectAt` method to find a bus using
+  the index.
+
+  ```
+  var busses = audioService.get('busses');
+  var bus1 = busses.objectAt(0);
+  var bus6 = busses.objectAt(5);
+  ```
 
   @class AudioService
   @namespace Services
@@ -28,32 +78,58 @@ export default Ember.Service.extend({
 
     @property audioContext
     @type {Object}
+    @private
   */
   audioContext: audioContext,
 
   /**
+    ## Busses
+
+    This is an array of `AudioBusObject`s.  Busses can be accessed by using the
+    `objectAt` method to find a bus using the index.  The array is indexed from 0.
+
+    ```
+    var busses = audioService.get('busses');
+    var bus1 = busses.objectAt(0);
+    var bus6 = busses.objectAt(5);
+    ```
+
     @property busses
     @type {Array}
   */
   busses: Ember.A(),
 
   /**
+    ## Channels
+
+    This is an array of `ChannelStripObject`s.  Channel strips can be accessed
+    by using the `objectAt` method to find a channel using the index.  The array
+    is indexed from 0.
+
+    ```
+    var channels = audioService.get('channels');
+    var ch1 = channels.objectAt(0);
+    var ch6 = channels.objectAt(5);
+    ```
+
     @property channels
     @type {Array}
   */
   channels: Ember.A(),
 
   /**
-    ## Distination
+    ## Destination
 
     Alias of `audioContext.destination`
 
     The represents the output of the audio system.
 
-      ```
-      var destination = this.get('audioService.destination');
-      source.connectOutput(destination);
-      ```
+    ```
+    var destination = audioService.get('destination');
+
+    // connect a source to the `destination` object.
+    source.connectOutput(destination);
+    ```
 
     @property destination
     @type {Object}
@@ -90,85 +166,108 @@ export default Ember.Service.extend({
   },
 
   /**
-    Create a single `AudioBus` object and add it to the `busses` array.
+    Create an `AudioBus` object.
 
     @method createBus
     @private
   */
   createBus() {
     var busses = this.get('busses');
-    var audioBusObject = AudioBusObject.create({
+    return AudioBusObject.create({
       audioService: this,
       id: busses.get('length') + 1
     });
-    busses.pushObject(audioBusObject);
   },
 
   /**
     ## Add Bus
 
-    Add an audio bus.
+    Use this method to add an `AudioBusObject` to the `busses` array.
+
+    ```
+    // add 1 bus
+    audioService.addBus();
+
+    // add 24 busses
+    audioService.addBus(24);
+    ```
 
     @method addBus
     @param {Integer} number The number of busses to add.
   */
   addBus(number) {
+    var busses = this.get('busses');
     if (typeof number === 'number') {
       for(var i = 0; i < parseInt(number); i++) {
-        this.createBus();
+        busses.pushObject(this.createBus());
       }
     } else {
-      this.createBus();
+      busses.pushObject(this.createBus());
     }
   },
 
   /**
-    Create a single `ChannelStrip` object and add it to the `channels` array.
+    Create a `ChannelStrip` object.
 
     @method createChannel
     @private
   */
   createChannel() {
     var channels = this.get('channels');
-    var channel = ChannelStrip.create({
+    return ChannelStrip.create({
       audioService: this,
       id: channels.get('length') + 1
     });
-    channels.pushObject(channel);
   },
 
   /**
     ## Add Channel
 
-    Add an audio channel.
+    Use this method to add a `ChannelStripObject` to the `channels` array.
+
+    ```
+    // add 1 channel
+    audioService.addChannel();
+
+    // add 24 channels
+    audioService.addChannel(24);
+    ```
 
     @method addChannel
     @param {Integer} number The number of channels to add.
   */
   addChannel(number) {
+    var channels = this.get('channels');
     if (typeof number === 'number') {
       for(var i = 0; i < parseInt(number); i++) {
-        this.createChannel();
+        channels.pushObject(this.createChannel());
       }
     } else {
-      this.createChannel();
+      channels.pushObject(this.createChannel());
     }
   },
 
   /**
+    ## Create Gain Object
 
-      ```
-      var gain = this.createGain({
-        input: source,
-        output: destination
-      });
+    Use this method to create a `GainObject`.
+    ```
+    var gain = this.createGain({
+      input: source,
+      output: destination
+    });
+    ```
 
-      // or
+    Or...
 
-      var gain = this.createGain();
-      source.connectOutput(gain);
-      gain.connectOutput(destination);
-      ```
+    ```
+    // create the gain object
+    var gain = this.createGain();
+
+    // connect the gain object to other objects.
+    source.connectOutput(gain);
+    gain.connectOutput(destination);
+    ```
 
     @method createGain
     @param {Object} params
