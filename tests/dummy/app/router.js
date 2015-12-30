@@ -6,6 +6,9 @@ var Router = Ember.Router.extend({
 });
 
 Router.map(function() {
+  this.route('audio-player');
+  this.route('tone-generator');
+  this.route('channel-strip');
 });
 
 export default Router;

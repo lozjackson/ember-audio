@@ -1,0 +1,6 @@
+{{yield bus}}
+<select class="bus-select" {{action "selectBus" on="change"}}>
+  {{#each audioService.busses as |b index|}}
+    <option value={{index}}>Bus {{index}}</option>
+  {{/each}}
+</select>

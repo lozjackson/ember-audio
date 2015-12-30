@@ -33,7 +33,7 @@ module.exports = function(environment) {
       'connect-src': "'self'",
       'img-src': "'self'",
       'style-src': "'self' 'unsafe-inline'",
-      'media-src': "'self' http://localhost"
+      'media-src': "'self'"
     }
   }
 

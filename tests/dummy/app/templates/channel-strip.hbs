@@ -1,0 +1,40 @@
+<div>
+{{!level-meter input=audioService.busses.firstObject.nodes.firstObject.node}}
+{{#each audioService.busses as |bus|}}
+  <div style="display:inline-block;">
+    <div>
+      {{level-meter input=bus.input}}
+    </div>
+  </div>
+  {{!audio-gain}}
+{{/each}}
+</div>
+
+<h2>Channel Strip</h2>
+<button {{action "addGainNode"}}>Add Node</button>
+{{input type="checkbox" checked=channel.bypass }} Bypass
+<div>
+  {{!input type="range" value=gain1.gain min=gain1.min max=gain1.max step="0.01"}}
+  <div style="display: inline-block;">
+    IN: {{level-meter input=channel.inputGainStage}}
+  </div>
+  {{!level-meter input=gain1.input}}
+  {{#each channel.nodes as |node i|}}
+    <div style="display: inline-block; border: 1px solid black;">
+      <div style="display: inline-block;">Node {{i}}</div>
+      <div style="display: inline-block;">
+        {{input
+          type="range"
+          min=node.min
+          max=node.max step="0.001"
+          value=node.gain}}
+      </div>
+      <div style="display: inline-block;">
+        {{level-meter input=node.processor}}
+      </div>
+    </div>
+  {{/each}}
+  <div style="display: inline-block;">
+    Out: {{level-meter input=channel.outputGainStage}}
+  </div>
+</div>

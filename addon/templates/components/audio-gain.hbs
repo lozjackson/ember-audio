@@ -1,0 +1,9 @@
+<div>
+  Gain: {{gain}}
+</div>
+<div>
+  {{input type="range" value=gain min="0" max="1" step="0.001" }}
+</div>
+{{#if hasBlock}}
+  {{yield processor}}
+{{/if}}

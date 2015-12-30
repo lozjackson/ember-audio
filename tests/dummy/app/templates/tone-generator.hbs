@@ -1,0 +1,36 @@
+<h2>Tone-generator</h2>
+
+<div style="display:inline-block; border: 1px solid black;">
+  <h3>BUS 1</h3>
+  {{#audio-filter input=bus1 type="highpass" frequency="40" as |filter|}}
+    <button {{action "invertPolarity" 0}}>POLARITY</button>
+    {{#audio-gain input=filter output=output as |amp|}}
+      {{level-meter input=amp}}
+    {{/audio-gain}}
+  {{/audio-filter}}
+</div>
+
+
+<div style="display:inline-block; border: 1px solid black;">
+  <h3>BUS 2</h3>
+
+  {{#audio-filter input=bus2 type="highpass" as |filter|}}
+    <button {{action "invertPolarity" 1}}>POLARITY</button>
+    {{#audio-gain input=filter output=output as |amp|}}
+      {{level-meter input=amp}}
+    {{/audio-gain}}
+  {{/audio-filter}}
+</div>
+
+{{!tone-generator output=output}}
+
+{{#tone-generator as |src|}}
+  <button {{action "activateBus" src 0}}>BUS 1</button>
+  <button {{action "activateBus" src 1}}>BUS 2</button>
+  {{#audio-filter input=src as |filter|}}
+    {{level-meter input=filter}}
+    {{#audio-gain input=filter output=output as |amp|}}
+      {{level-meter input=amp}}
+    {{/audio-gain}}
+  {{/audio-filter}}
+{{/tone-generator}}

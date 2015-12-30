@@ -1,5 +1,19 @@
 <h2 id="title">ember-audio</h2>
 
-{{audio-player src="http://localhost/test.mp3"}}
-
+{{audio-player src="assets/test.mp3" output=bus1.input}}
+{{audio-player src="assets/test.mp3" output=bus2.input}}
+<ul>
+  <li>
+    {{#link-to 'index'}}Index{{/link-to}}
+  </li>
+  <li>
+    {{#link-to 'audio-player'}}Audio player{{/link-to}}
+  </li>
+  <li>
+    {{#link-to 'tone-generator'}}Tone generator{{/link-to}}
+  </li>
+  <li>
+    {{#link-to 'channel-strip'}}Channel Strip{{/link-to}}
+  </li>
+</ul>
 {{outlet}}

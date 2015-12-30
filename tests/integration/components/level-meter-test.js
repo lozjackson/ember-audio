@@ -1,7 +1,7 @@
 // import { moduleForComponent, test } from 'ember-qunit';
 // import hbs from 'htmlbars-inline-precompile';
 //
-// moduleForComponent('audio-player', 'Integration | Component | audio player', {
+// moduleForComponent('level-meter', 'Integration | Component | level meter', {
 //   integration: true
 // });
 //
@@ -11,15 +11,15 @@
 //   // Set any properties with this.set('myProperty', 'value');
 //   // Handle any actions with this.on('myAction', function(val) { ... });
 //
-//   this.render(hbs`{{audio-player}}`);
+//   this.render(hbs`{{level-meter}}`);
 //
 //   assert.equal(this.$().text().trim(), '');
 //
 //   // Template block usage:
 //   this.render(hbs`
-//     {{#audio-player}}
+//     {{#level-meter}}
 //       template block text
-//     {{/audio-player}}
+//     {{/level-meter}}
 //   `);
 //
 //   assert.equal(this.$().text().trim(), 'template block text');
