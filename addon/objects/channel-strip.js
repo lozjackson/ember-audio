@@ -11,8 +11,14 @@ var observer = Ember.observer;
   ## Channel Strip
 
   This is a processing chain - A chain of audio processor nodes connected in series.
-  There is an gain node at either end of the chain that represent the input and
+  There is a `GainObject` at either end of the chain that represent the input and
   output of the channel strip.
+
+  ```
+  var channelStrip = ChannelStripObject.create({
+    audioService: audioService,  // the `audioService` is required and is not automatically injected.
+  });
+  ```
 
   @class ChannelStripObject
   @namespace Objects
@@ -22,13 +28,13 @@ export default Ember.Object.extend(io, {
 
   /**
     This is required and is not automatically injected.  Pass in the audioService
-    when creating it.
+    when creating the channel strip object
 
-      ```
-      ChannelStripObject.create({
-        audioService: this.get('audioService')
-      });
-      ```
+    ```
+    ChannelStripObject.create({
+      audioService: audioService
+    });
+    ```
 
     @property audioService
     @type {Object}
@@ -46,7 +52,7 @@ export default Ember.Object.extend(io, {
   /**
     ## Input Gain Stage
 
-    This is a Gain Object and is the first node in the processing chain.  It sets
+    This is a `GainObject` and is the first node in the processing chain.  It sets
     the input gain of the channel strip.
 
     @property inputGainStage
@@ -57,7 +63,7 @@ export default Ember.Object.extend(io, {
   /**
     ## Output Gain Stage
 
-    This is a Gain Object and is the last node in the processing chain.  It sets
+    This is a `GainObject` and is the last node in the processing chain.  It sets
     the output gain of the channel strip.
 
     @property outputGainStage
@@ -66,8 +72,13 @@ export default Ember.Object.extend(io, {
   outputGainStage: null,
 
   /**
-    An array of processing nodes that sit between the input and output.  These
-    nodes together with the input/output gain stages form the processing chain.
+    ## Nodes
+
+    This is an array of processing nodes that sit between the input and output.
+    These nodes together with the input/output gain stages form the processing
+    chain.
+
+    Nodes can be added using the `addNode` method.
 
     @property nodes
     @type {Array}
@@ -75,6 +86,11 @@ export default Ember.Object.extend(io, {
   nodes: Ember.A(),
 
   /**
+    ## Bypass
+
+    Bypass the processing chain - If this property is `true` then the `inputGainStage`
+    will be connected directly to the `outputGainStage`.
+
     @property bypass
     @type {Boolean}
     @default false
@@ -105,7 +121,8 @@ export default Ember.Object.extend(io, {
   /**
     ## inputGain
 
-    This is the gain for the `inputGainStage`..  A value of `1` is full volume.  0 is no output.
+    This is the gain for the `inputGainStage`.  A value of `1` is full volume (0dB).
+    0 is no output (-infinity).
 
     @property inputGain
     @type {Number}
@@ -115,7 +132,8 @@ export default Ember.Object.extend(io, {
   /**
     ## outputGain
 
-    This is the gain for the `outputGainStage`..  A value of `1` is full volume.  0 is no output.
+    This is the gain for the `outputGainStage`.  A value of `1` is full volume (0dB).
+    0 is no output (-infinity).
 
     @property outputGain
     @type {Number}
@@ -154,6 +172,22 @@ export default Ember.Object.extend(io, {
   },
 
   /**
+    ## Bypass Nodes
+
+    This method will bypass the `nodes` array that form the processing chain.
+
+    To connect the `inputGainStage` directly to the `outputGainStage`..
+
+    ```
+    this.bypassNodes(true);
+    ```
+
+    To route the audio through the `nodes` array...
+
+    ```
+    this.bypassNodes(false);
+    ```
+
     @method bypassNodes
     @param {Boolean} bypass
     @private
@@ -171,6 +205,12 @@ export default Ember.Object.extend(io, {
   },
 
   /**
+    ## Chain Nodes
+
+    Connect the objects in the `nodes` array in series to create a processing chain.
+    The `inputGainStage` is connected to the first node, then the nodes are chained,
+    then the last node is connected to the `outputGainStage`.
+
     @method chainNodes
     @private
   */
@@ -195,6 +235,8 @@ export default Ember.Object.extend(io, {
   },
 
   /**
+    Create the input and output gain stages, and chain the nodes.
+
     @method createIO
     @private
   */
@@ -205,6 +247,8 @@ export default Ember.Object.extend(io, {
   },
 
   /**
+    Assign a `GainObject` to the `inputGainStage`.
+
     @method createInputGainStage
     @private
   */
@@ -213,6 +257,8 @@ export default Ember.Object.extend(io, {
   },
 
   /**
+    Assign a `GainObject` to the `outputGainStage`.
+
     @method createOutputGainStage
     @private
   */
@@ -221,7 +267,9 @@ export default Ember.Object.extend(io, {
   },
 
   /**
-    Calls the `audioService.createGain` method.
+    ## Create Gain Object
+
+    Calls the `audioService.createGain` method.  A `GainObject` is returned.
 
     @method createGain
     @return {Object} gain
