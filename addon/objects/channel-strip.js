@@ -215,25 +215,20 @@ export default Ember.Object.extend(io, {
     @private
   */
   chainNodes() {
-    var {inputGainStage, outputGainStage, nodes} = this.getProperties('inputGainStage', 'outputGainStage', 'nodes');
+    var {nodes, bypass} = this.getProperties('nodes', 'bypass');
     var nodesLength = nodes.get('length');
-    if (nodesLength === 0) {
-      this.bypassNodes(true);
-    } else {
-      inputGainStage.connectOutput(nodes.get('firstObject'));
-      for (var i = 0; i < nodesLength; i++) {
-        var nextNodeIndex = i + 1;
-        if (nextNodeIndex < nodesLength) {
-          var nextNode = nodes[nextNodeIndex];
-          if (nextNode) {
-            nodes[i].connectOutput(nextNode);
-          }
+    for (var i = 0; i < nodesLength; i++) {
+      var nextNodeIndex = i + 1;
+      if (nextNodeIndex < nodesLength) {
+        var nextNode = nodes[nextNodeIndex];
+        if (nextNode) {
+          nodes[i].connectOutput(nextNode);
         }
       }
-      nodes.get('lastObject').connectOutput(outputGainStage);
     }
+    this.bypassNodes(nodesLength === 0 || bypass);
   },
-
+  
   /**
     Create the input and output gain stages, and chain the nodes.
 

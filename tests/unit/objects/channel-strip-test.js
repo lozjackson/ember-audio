@@ -257,6 +257,45 @@ test('chainNodes method - 2 nodes', function (assert) {
   subject.chainNodes();
 });
 
+test('chainNodes method - with bypass', function (assert) {
+  assert.expect(4);
+  var ChannelStripObject = ChannelStrip.extend({
+    createIO: () => {},
+    inputGainStage: {
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    },
+    outputGainStage: {
+      name: 'outputGainStage'
+    }
+  });
+  var subject = ChannelStripObject.create({
+    audioService: audioService,
+    bypass: true
+  });
+  subject.set('nodes', Ember.A([
+    {
+      name: 'node1',
+      connectOutput: (node) => {
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'node2', `'node.name' should be 'node2'`);
+      }
+    },
+    {
+      name: 'node2',
+      connectOutput: (node) => {
+        // these 2 asserts should not happen..
+        assert.ok(true, `'connectOutput' method has been called`);
+        assert.equal(node.name, 'outputGainStage', `'node.name' should be 'outputGainStage'`);
+      }
+    }
+  ]));
+
+  subject.chainNodes();
+});
+
 test('createIO method', function(assert) {
   assert.expect(3);
   var subject = ChannelStrip.create({ audioService: audioService });
