@@ -173,15 +173,16 @@ export default Ember.Mixin.create({
   /**
     ## Connect Output
 
-    Connect an output to a destination.
+    Connect an output to a destination.  Store the destination in the `outputs`
+    array and register the input on the destination object.
 
-      ```
-      // connect the main output of `source` to `destination`
-      source.connectOutput(destination);
+    ```
+    // connect the main output of `source` to `destination`
+    source.connectOutput(destination);
 
-      // connect a second output (output 1) from `source` to `auxBus`.
-      source.connectOutput(auxBus, 1);
-      ```
+    // connect a second output (output 1) from `source` to `auxBus`.
+    source.connectOutput(auxBus, 1);
+    ```
 
     @method connectOutput
     @param {Object} node
