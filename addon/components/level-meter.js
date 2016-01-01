@@ -5,6 +5,10 @@ import Ember from 'ember';
 import io from 'ember-audio/mixins/io';
 import ProcessorMixin from 'ember-audio/mixins/processor';
 
+var computed = Ember.computed;
+
+// var maxdB = null;
+
 /**
   ## Level Meter Component
 
@@ -50,6 +54,33 @@ export default Ember.Component.extend(io, ProcessorMixin, {
   */
   height: 100,
 
+
+
+  // /**
+  //   @property maxdB
+  //   @type {Number}
+  // */
+  // maxdB: null,
+
+  /**
+    ## Background Color
+
+    The background colour of the level meter.
+
+    @property backgroundColor
+    @type {String}
+  */
+  backgroundColor: '#555',
+
+  /**
+    @property canvas
+    @type {Object}
+    @private
+  */
+  canvas: computed(function () {
+    return this.$()[0];
+  }),
+
   /**
     @method createProcessor
     @private
@@ -62,27 +93,6 @@ export default Ember.Component.extend(io, ProcessorMixin, {
   },
 
   /**
-    Connect the processor to the input and output.
-
-    NOTE: Both input and output of the level meter must be connected, otherwise the
-    level meter doesn't work.  So if `output` is not provided then the output is
-    connected to the `audioContext.destination` object.
-
-    @method connectProcessor
-    @param {Object} processor
-    @private
-  */
-  connectProcessor() {
-    var input = this.get('input');
-    var output = this.get('output');// || this.get('audioService.destination');
-    var processor = this.get('processor');
-    if (input && processor){
-      input.connect(processor);
-    }
-    this.connectOutput(output);
-  },
-
-  /**
     ## Connect Input
 
     Connect `source` to an input of the level meter.  This method calls `source.connect`.
@@ -91,6 +101,12 @@ export default Ember.Component.extend(io, ProcessorMixin, {
     // connect `source` to `levelMeter`
     levelMeter.connectInput(source);
     ```
+
+    NOTE: When using the `connectInput` method, the source connects to the
+          `LevelMeterComponent` anonymously.. that is the source audio node
+          connects directly to the level meter's `processor` and doesn't register
+          inputs/outputs - This is to prevent the `LevelMeterComponent` from being
+          disconnected when the source is connected to other audio nodes.
 
     @method connectInput
     @param {Object} source
@@ -105,6 +121,10 @@ export default Ember.Component.extend(io, ProcessorMixin, {
   /**
     ## Connect Output
 
+    NOTE: Both input and output of the level meter must be connected, otherwise the
+    level meter doesn't work.  So if `output` is not provided then the output is
+    connected directly to the `audioService.destination` object.
+
     @method connectOutput
     @param {Object} node
     @param {Integer} output
@@ -113,84 +133,86 @@ export default Ember.Component.extend(io, ProcessorMixin, {
   connectOutput(node, output) {
     if (!node) {
       node = this.get('audioService.destination');
-      // Ember.Logger.log('node', node);
     }
     this._super(node, output);
   },
 
-  // /**
-  //   @method changeOutput
-  //   @private
-  // */
-  // changeOutput() {
-  //   var output = this.get('output') || this.get('audioService.destination');
-  //   if (output) {
-  //     this.connectOutput(output);
-  //   }
-  // },
+  /**
+    @method draw
+  */
+  draw() {
+    var {processor, canvas, backgroundColor} = this.getProperties('processor', 'canvas', 'backgroundColor');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0,0,w,h);
 
-  // /**
-  //   If the output changes, connect the processor to it.
-  //
-  //   @method outputChanged
-  // */
-  // ouputChanged: Ember.observer('output', 'processor', function() {
-  //   var output = this.get('output') || this.get('audioService.destination');
-  //   var processor = this.get('processor');
-  //   if ( output && processor ) {
-  //     processor.connect(output);
-  //   } else {
-  //     processor.disconnect(0);
-  //   }
-  // }),
+    var grad = ctx.createLinearGradient(w/10,h*0.2,w/10,h*0.95);
+    grad.addColorStop(0,'red');
+    grad.addColorStop(-6/-72,'yellow');
+    grad.addColorStop(1,'green');
+
+    if (processor) {
+      processor.onaudioprocess = function(e){
+        var out = e.outputBuffer.getChannelData(0);
+        var int = e.inputBuffer.getChannelData(0);
+        var max = 0;
+
+        for(var i = 0; i < int.length; i++){
+          out[i] = 0;
+          max = int[i] > max ? int[i] : max;
+        }
+
+        var dB = 20*Math.log(Math.max(max,Math.pow(10,-72/20)))/Math.LN10;
+
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0,0,w,h);
+        ctx.fillStyle = grad;
+        ctx.fillRect(w/10,h*0.8*(dB/-72),w*8/10,(h*0.95)-h*0.8*(dB/-72));
+
+        // if (dB > maxdB || maxdB === null || typeof maxdB === 'undefined') {
+        //   // _this.setMaxdB(dB);
+        //   maxdB = dB;
+        //   _this.set('maxdB', Number(maxdB).toFixed(1));
+        // }
+        // ctx.fillStyle="white";
+        // ctx.font = "Arial 12pt";
+        // ctx.textAlign = "center";
+        // ctx.fillText(Math.round(maxdB*100)/100+' dB',w/2,h-h*0.025);
+      };
+    }
+  },
 
   /**
     @method didInsertElement
     @private
   */
   didInsertElement() {
-    var canvas = this.$()[0];
-  	var ctx = canvas.getContext('2d');
-  	var w = canvas.width;
-  	var h = canvas.height;
-    var processor = this.get('processor');
-
-  	//fill the canvas first
-  	ctx.fillStyle = '#555';
-  	ctx.fillRect(0,0,w,h);
-    if (processor) {
-      processor.onaudioprocess = function(e){
-    		var out = e.outputBuffer.getChannelData(0);
-    		var int = e.inputBuffer.getChannelData(0);
-    		var max = 0;
-
-    		for(var i = 0; i < int.length; i++){
-    			out[i] = 0;//prevent feedback and we only need the input data
-    			max = int[i] > max ? int[i] : max;
-    		}
-    		//convert from magitude to decibel
-    		var db = 20*Math.log(Math.max(max,Math.pow(10,-72/20)))/Math.LN10;
-    		//It's time to draw on the canvas
-    		//create the gradient
-    		var grad = ctx.createLinearGradient(w/10,h*0.2,w/10,h*0.95);
-    		grad.addColorStop(0,'red');
-    		grad.addColorStop(-6/-72,'yellow');
-    		grad.addColorStop(1,'green');
-
-    		//fill the background
-    		ctx.fillStyle = '#555';
-    		ctx.fillRect(0,0,w,h);
-    		ctx.fillStyle = grad;
-    		//draw the rectangle
-    		ctx.fillRect(w/10,h*0.8*(db/-72),w*8/10,(h*0.95)-h*0.8*(db/-72));
-    		//draw the text out
-        // if (displayText) {
-        //   ctx.fillStyle="white";
-      	// 	ctx.font = "Arial 12pt";
-      	// 	ctx.textAlign = "center";
-      	// 	ctx.fillText(Math.round(db*100)/100+' dB',w/2,h-h*0.025);
-        // }
-    	};
-    }
+    this.draw();
   },
+
+  // /**
+  //   @method setMaxdB
+  //   @param {Number} dB
+  // */
+  // setMaxdB(dB) {
+  //   maxdB = dB;
+  //   this.set('maxdB', Number(dB).toFixed(1));
+  // },
+
+  // /**
+  //   @method _resetMaxdB
+  // */
+  // _resetMaxdB() {
+  //   // maxdB = undefined;
+  //   // this.set('maxdB', null);
+  //   // this.setMaxdB();
+  // },
+
+  // actions: {
+  //   resetMaxdB() {
+  //     this._resetMaxdB();
+  //   }
+  // }
 });
