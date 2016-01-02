@@ -22,7 +22,7 @@ var observer = Ember.observer;
 
   @class ChannelStripObject
   @namespace Objects
-  @uses EmberAudio.IoMixin
+  @uses Mixins.IoMixin
 */
 export default Ember.Object.extend(io, {
 
@@ -48,6 +48,14 @@ export default Ember.Object.extend(io, {
     @type {Integer}
   */
   id: null,
+
+  /**
+    This is only used for reference.
+
+    @property name
+    @type {String}
+  */
+  name: '',
 
   /**
     ## Input Gain Stage
@@ -228,7 +236,7 @@ export default Ember.Object.extend(io, {
     }
     this.bypassNodes(nodesLength === 0 || bypass);
   },
-  
+
   /**
     Create the input and output gain stages, and chain the nodes.
 
