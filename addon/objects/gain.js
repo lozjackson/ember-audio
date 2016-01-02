@@ -17,8 +17,8 @@ const observer = Ember.observer;
 
   @class GainObject
   @namespace Objects
-  @uses EmberAudio.IoMixin
-  @uses EmberAudio.ProcessorMixin
+  @uses Mixins.IoMixin
+  @uses Mixins.ProcessorMixin
 */
 export default Ember.Object.extend( io, ProcessorMixin, {
 

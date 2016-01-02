@@ -14,8 +14,8 @@ var computed = Ember.computed;
 
   @class LevelMeterComponent
   @namespace Components
-  @uses EmberAudio.IoMixin
-  @uses EmberAudio.ProcessorMixin
+  @uses Mixins.IoMixin
+  @uses Mixins.ProcessorMixin
 */
 export default Ember.Component.extend(io, ProcessorMixin, {
 

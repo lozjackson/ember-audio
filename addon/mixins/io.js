@@ -30,6 +30,19 @@ export default Ember.Mixin.create({
   /**
     ## Inputs
 
+    This is an `Ember.Array` of `Ember.Objects`.  Each object has a `node` property
+    and an `output` property.  The `node` is the source node that is connecting
+    to the input, the `output` is the output number from the source.
+
+    ```
+    Ember.Object.create({
+      node: outputNode,
+      output: outputNumber
+    });
+    ```
+
+    NOTE:  To Register an input, use the `registerInput` method.
+
     @property inputs
     @type {Array}
     @private
@@ -101,6 +114,12 @@ export default Ember.Mixin.create({
   },
 
   /**
+    ## Register Input
+
+    ```
+    node.registerInput(source, outputNumber);
+    ```
+
     @method registerInput
   */
   registerInput(outputNode, outputNumber) {

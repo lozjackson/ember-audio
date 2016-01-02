@@ -14,7 +14,7 @@ import layout from '../templates/components/audio-gain';
 
   @class AudioGainComponent
   @namespace Components
-  @uses EmberAudio.ProcessorMixin
+  @uses Mixins.ProcessorMixin
 */
 export default Ember.Component.extend( /*ProcessorMixin,*/{
 
