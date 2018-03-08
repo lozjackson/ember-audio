@@ -16,9 +16,11 @@ test('it works', function(assert) {
 
 test('inputs and outputs are reset on init', function(assert) {
   assert.expect(2);
+  const inputs = [1,2,3];
+  const outputs = [1,2,3];
   var IoObject = EmberObject.extend(IoMixin, {
-    inputs: [1,2,3],
-    outputs: [1,2,3]
+    inputs,
+    outputs
   });
 
   var subject = IoObject.create();
