@@ -1,7 +1,9 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { observer } from '@ember/object';
+
+import Component from '@ember/component';
 import io from 'ember-audio/mixins/io';
 import ProcessorMixin from 'ember-audio/mixins/processor';
 
@@ -13,7 +15,7 @@ import ProcessorMixin from 'ember-audio/mixins/processor';
   @uses EmberAudio.IoMixin
   @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Component.extend(io, ProcessorMixin, {
+export default Component.extend(io, ProcessorMixin, {
 
   tagName: 'canvas',
 
@@ -57,7 +59,7 @@ export default Ember.Component.extend(io, ProcessorMixin, {
 
     @method outputChanged
   */
-  ouputChanged: Ember.observer('output', 'processor', function() {
+  ouputChanged: observer('output', 'processor', function() {
     var output = this.get('output') || this.get('audioService.destination');
     var processor = this.get('processor');
     if ( output && processor ) {

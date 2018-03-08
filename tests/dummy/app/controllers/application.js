@@ -1,8 +1,9 @@
-import Ember from 'ember';
+import { computed } from '@ember/object';
+import Controller from '@ember/controller';
 
 // var c = [false, false];
 
-export default Ember.Controller.extend({
+export default Controller.extend({
 
   init() {
     this._super(...arguments);
@@ -30,12 +31,12 @@ export default Ember.Controller.extend({
 
   channel: null,
 
-  bus1: Ember.computed('audioService.busses.[]', function() {
+  bus1: computed('audioService.busses.[]', function() {
     var busses = this.get('audioService.busses');
     return busses.objectAt(0);
   }),
 
-  bus2: Ember.computed('audioService.busses.[]', function() {
+  bus2: computed('audioService.busses.[]', function() {
     var busses = this.get('audioService.busses');
     return busses.objectAt(1);
   }),

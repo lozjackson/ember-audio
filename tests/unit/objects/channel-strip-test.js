@@ -1,5 +1,5 @@
+import { A } from '@ember/array';
 import { module, test } from 'qunit';
-import Ember from 'ember';
 import ChannelStrip from 'ember-audio/objects/channel-strip';
 import GainObject from 'ember-audio/objects/gain';
 import AudioService from 'ember-audio/services/audio-service';
@@ -153,7 +153,7 @@ test('bypassNodes method false - 1 node', function (assert) {
     }
   });
   var subject = ChannelStripObject.create({ audioService: audioService });
-  subject.set('nodes', Ember.A([
+  subject.set('nodes', A([
     {
       name: 'node',
       connectOutput: (node) => {
@@ -211,7 +211,7 @@ test('chainNodes method - 1 node', function (assert) {
     }
   });
   var subject = ChannelStripObject.create({ audioService: audioService });
-  subject.set('nodes', Ember.A([
+  subject.set('nodes', A([
     {
       name: 'node',
       connectOutput: (node) => {
@@ -238,7 +238,7 @@ test('chainNodes method - 2 nodes', function (assert) {
     }
   });
   var subject = ChannelStripObject.create({ audioService: audioService });
-  subject.set('nodes', Ember.A([
+  subject.set('nodes', A([
     {
       name: 'node1',
       connectOutput: (node) => {

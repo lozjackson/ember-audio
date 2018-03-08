@@ -1,13 +1,15 @@
-import Ember from 'ember';
+import { observer, computed } from '@ember/object';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/tone-generator';
 
-export default Ember.Component.extend({
+export default Component.extend({
 
   layout: layout,
 
   classNames: [ 'ember-audio', 'tone-generator'],
 
-  audioService: Ember.inject.service(),
+  audioService: service(),
 
   osc: null,
 
@@ -36,14 +38,14 @@ export default Ember.Component.extend({
     });
   },
 
-  volumeChanged: Ember.observer( 'gain', 'linearGain', function() {
+  volumeChanged: observer( 'gain', 'linearGain', function() {
     var amp = this.get('amp');
     var gain = this.get('gain');
     var linearGain = this.get('linearGain');
     amp.gain.value = (linearGain) ? gain : gain * gain;
   }),
 
-  _frequency: Ember.computed( 'osc', 'frequency', {
+  _frequency: computed( 'osc', 'frequency', {
     get() {
       var osc = this.get('osc');
       if (!osc) {

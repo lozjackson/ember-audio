@@ -1,11 +1,12 @@
 /**
   @module ember-audio
 */
+import { A } from '@ember/array';
+
+import { alias } from '@ember/object/computed';
+import EmberObject, { observer } from '@ember/object';
 import Ember from 'ember';
 import io from 'ember-audio/mixins/io';
-
-var alias = Ember.computed.alias;
-var observer = Ember.observer;
 
 /**
   ## Channel Strip
@@ -24,7 +25,7 @@ var observer = Ember.observer;
   @namespace Objects
   @uses EmberAudio.IoMixin
 */
-export default Ember.Object.extend(io, {
+export default EmberObject.extend(io, {
 
   /**
     This is required and is not automatically injected.  Pass in the audioService
@@ -83,7 +84,7 @@ export default Ember.Object.extend(io, {
     @property nodes
     @type {Array}
   */
-  nodes: Ember.A(),
+  nodes: A(),
 
   /**
     ## Bypass
@@ -164,7 +165,7 @@ export default Ember.Object.extend(io, {
   */
   init() {
     this._super(...arguments);
-    this.set('nodes', Ember.A());
+    this.set('nodes', A());
     if (!this.get('audioService')) {
       Ember.Logger.warn('`audioService` is not defined.');
     }

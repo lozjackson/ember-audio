@@ -1,12 +1,10 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import EmberObject, { computed, observer } from '@ember/object';
+
 import ProcessorMixin from 'ember-audio/mixins/processor';
 import io from 'ember-audio/mixins/io';
-
-const computed = Ember.computed;
-const observer = Ember.observer;
 
 /**
   ## GainObject
@@ -20,7 +18,7 @@ const observer = Ember.observer;
   @uses EmberAudio.IoMixin
   @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Object.extend( io, ProcessorMixin, {
+export default EmberObject.extend( io, ProcessorMixin, {
 
   /**
     This is required and is not automatically injected.  Pass in the audioService

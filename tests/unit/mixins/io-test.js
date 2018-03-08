@@ -1,4 +1,5 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
+import EmberObject from '@ember/object';
 import IoMixin from '../../../mixins/io';
 import AudioService from 'ember-audio/services/audio-service';
 import { module, test } from 'qunit';
@@ -8,14 +9,14 @@ module('Unit | Mixin | io');
 var audioService = AudioService.create();
 
 test('it works', function(assert) {
-  var IoObject = Ember.Object.extend(IoMixin);
+  var IoObject = EmberObject.extend(IoMixin);
   var subject = IoObject.create();
   assert.ok(subject);
 });
 
 test('inputs and outputs are reset on init', function(assert) {
   assert.expect(2);
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     inputs: [1,2,3],
     outputs: [1,2,3]
   });
@@ -27,7 +28,7 @@ test('inputs and outputs are reset on init', function(assert) {
 
 test('connect method', function(assert) {
   assert.expect(3);
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     processor: {
       connect: function (obj) {
         assert.ok(true, `'processor.connect' method has been called`);
@@ -43,7 +44,7 @@ test('connect method', function(assert) {
 
 test('disconnect method', function(assert) {
   assert.expect(3);
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     processor: {
       name: 'processor',
       disconnect: function (obj) {
@@ -62,8 +63,8 @@ test('registerInput method', function(assert) {
   assert.expect(7);
   var source1 = audioService.createGain({id:1});
   var source2 = audioService.createGain({id:2});
-  var IoObject = Ember.Object.extend(IoMixin, {
-    inputs: Ember.A()
+  var IoObject = EmberObject.extend(IoMixin, {
+    inputs: A()
   });
 
   var subject = IoObject.create();
@@ -84,8 +85,8 @@ test('unregisterInput method', function(assert) {
   assert.expect(7);
   var source1 = audioService.createGain({id:1});
   var source2 = audioService.createGain({id:2});
-  var IoObject = Ember.Object.extend(IoMixin, {
-    inputs: Ember.A()
+  var IoObject = EmberObject.extend(IoMixin, {
+    inputs: A()
   });
 
   var subject = IoObject.create();
@@ -111,7 +112,7 @@ test('connectOutput method - pass audioNode', function(assert) {
   var destination = audioService.createGain();
   var processor = destination.get('processor');
   processor.id = 1;
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: [],
     connectNode: function (obj) {
       assert.ok(true, `'input.connect' method has been called`);
@@ -132,7 +133,7 @@ test('connectOutput method - pass audioNode', function(assert) {
 test('connectOutput method calls registerInput', function(assert) {
   assert.expect(3);
   var destination = audioService.createGain();
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: []
   });
 
@@ -150,7 +151,7 @@ test('connectOutput method calls registerInput', function(assert) {
 test('disconnectOutput method calls unregisterInput', function(assert) {
   assert.expect(2);
   var destination = audioService.createGain();
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: []
   });
 
@@ -168,7 +169,7 @@ test('disconnectOutput method calls unregisterInput', function(assert) {
 test('connectOutput method does not break when audioNode is passed in', function(assert) {
   assert.expect(1);
   var destination = audioService.createGain();
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: []
   });
 
@@ -180,7 +181,7 @@ test('connectOutput method does not break when audioNode is passed in', function
 test('disconnectOutput method does not break when audioNode is passed in', function(assert) {
   assert.expect(1);
   var destination = audioService.createGain();
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: []
   });
 
@@ -195,7 +196,7 @@ test('connectOutput method - pass object instead of audioNode', function(assert)
   var destination = audioService.createGain({id:1});
   var processor = destination.get('processor');
   processor.id = 2;
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: [],
     connectNode: function (obj) {
       assert.ok(true, `'input.connect' method has been called`);
@@ -216,7 +217,7 @@ test('connectOutput method - pass object instead of audioNode', function(assert)
 test('connectOutput method - check destination inputs reference', function(assert) {
   assert.expect(4);
   var destination = audioService.createGain();
-  var IoObject = Ember.Object.extend(IoMixin);
+  var IoObject = EmberObject.extend(IoMixin);
 
   var subject = IoObject.create();
   subject.connectOutput(destination, 2);
@@ -231,7 +232,7 @@ test('connectOutput method - check destination inputs reference', function(asser
 test('connectOutput method - pass null', function(assert) {
   assert.expect(4);
   var destination = audioService.createGain({id:1});
-  var IoObject = Ember.Object.extend(IoMixin, { outputs: [] });
+  var IoObject = EmberObject.extend(IoMixin, { outputs: [] });
   var subject = IoObject.create();
 
   subject.connectOutput(destination);
@@ -250,7 +251,7 @@ test('connectOutput method - pass null, output 2', function(assert) {
   var destination3 = audioService.createGain();
   var destination4 = audioService.createGain();
 
-  var IoObject = Ember.Object.extend(IoMixin, { outputs: [] });
+  var IoObject = EmberObject.extend(IoMixin, { outputs: [] });
 
   var subject = IoObject.create();
 
@@ -273,7 +274,7 @@ test('connectOutput method - pass null, output 2', function(assert) {
 
 test('connectOutput method disconnects existing output at same index', function(assert) {
   assert.expect(8);
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: [],
     connect: function (obj) {
       assert.ok(true, `'input.connect' method has been called`);
@@ -297,7 +298,7 @@ test('connectOutput method disconnects existing output at same index', function(
 
 test('connectOutput method does not disconnect other outputs', function(assert) {
   assert.expect(12);
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     connect: function (obj) {
       assert.ok(true, `'input.connect' method has been called`);
       assert.equal(typeof obj, 'object', `typeof 'obj' is an object`);
@@ -331,7 +332,7 @@ test('disconnectOutput method', function(assert) {
   var destination = audioService.createGain();
   var processor = destination.get('processor');
   processor.id = 1;
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: [],
     disconnectNode: function () {
       assert.ok(true, `'input.disconnectNode' method has been called`);
@@ -351,7 +352,7 @@ test('connectNode method', function(assert) {
   var destination = audioService.createGain();
   var processor = destination.get('processor');
   processor.id = 1;
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: [],
     connect: function (obj) {
       assert.ok(true, `'input.connect' method has been called`);
@@ -370,7 +371,7 @@ test('disconnectNode method', function(assert) {
   var destination = audioService.createGain();
   var processor = destination.get('processor');
   processor.id = 1;
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     outputs: [],
     disconnect: function (obj) {
       assert.ok(true, `'input.disconnect' method has been called`);
@@ -427,7 +428,7 @@ test('changeInput method', function (assert) {
   assert.expect(3);
   var input = audioService.createGain({id:1});
   var gain = audioService.get('audioContext').createGain({id:2});
-  var IoObject = Ember.Object.extend(IoMixin);
+  var IoObject = EmberObject.extend(IoMixin);
   var subject = IoObject.create({
     input: input
   });
@@ -445,7 +446,7 @@ test('changeInput method', function (assert) {
 test('changeOutput method', function (assert) {
   assert.expect(3);
 
-  var IoObject = Ember.Object.extend(IoMixin, {
+  var IoObject = EmberObject.extend(IoMixin, {
     output: {id:1},
     connectOutput: function (obj) {
       assert.ok(true, `'connectOutput' method has been called`);

@@ -1,12 +1,10 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { alias, readOnly } from '@ember/object/computed';
 
-var computed = Ember.computed;
-var alias = computed.alias;
-var readOnly = computed.readOnly;
-var observer = Ember.observer;
+import Mixin from '@ember/object/mixin';
+import { computed, observer } from '@ember/object';
 
 /**
   ## AudioBusMixin
@@ -14,7 +12,7 @@ var observer = Ember.observer;
   @class AudioBusMixin
   @namespace Mixins
 */
-export default Ember.Mixin.create({
+export default Mixin.create({
 
   /**
     This is the bus.  It is actually a 'gainNode' pretending to be a bus.

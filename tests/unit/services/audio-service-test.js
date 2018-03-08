@@ -1,5 +1,5 @@
+import { typeOf } from '@ember/utils';
 import { moduleFor, test } from 'ember-qunit';
-import Ember from 'ember';
 
 moduleFor('service:audio-service', 'Unit | Service | audio service', {
 
@@ -48,7 +48,7 @@ test('createBus method should return AudioBusObject', function(assert) {
   assert.expect(1);
   var service = this.subject();
   var channel = service.createBus();
-  assert.equal(Ember.typeOf(channel), 'instance', `'Ember.typeOf(channel)' should be 'instance'`);
+  assert.equal(typeOf(channel), 'instance', `'Ember.typeOf(channel)' should be 'instance'`);
 });
 
 // test('createBus method', function(assert) {
@@ -154,7 +154,7 @@ test('createChannel method should return ChannelStripObject', function(assert) {
   // assert.equal(service.get('channels.length'), 0, `'channels.length' should be 0`);
 
   var channel = service.createChannel();
-  assert.equal(Ember.typeOf(channel), 'instance', `'Ember.typeOf(channel)' should be 'instance'`);
+  assert.equal(typeOf(channel), 'instance', `'Ember.typeOf(channel)' should be 'instance'`);
 });
 
 // test('createChannel method', function(assert) {

@@ -1,7 +1,9 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { computed } from '@ember/object';
+
+import Component from '@ember/component';
 import ProcessorMixin from 'ember-audio/mixins/processor';
 import layout from '../templates/components/audio-filter';
 
@@ -10,7 +12,7 @@ import layout from '../templates/components/audio-filter';
   @namespace Components
   @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Component.extend( ProcessorMixin, {
+export default Component.extend( ProcessorMixin, {
 
   layout: layout,
 
@@ -24,7 +26,7 @@ export default Ember.Component.extend( ProcessorMixin, {
 
   minValue: 20,
 
-  maxValue: Ember.computed('audioService.audioContext', function() {
+  maxValue: computed('audioService.audioContext', function() {
     var context = this.get('audioService.audioContext');
     return context.sampleRate / 2;
   }),
@@ -46,7 +48,7 @@ export default Ember.Component.extend( ProcessorMixin, {
     return filter;
   },
 
-  _frequency: Ember.computed( 'frequency', 'processor', {
+  _frequency: computed( 'frequency', 'processor', {
     get() {
       var filter = this.get('processor');
       return filter.frequency.value;
@@ -57,7 +59,7 @@ export default Ember.Component.extend( ProcessorMixin, {
     }
   }),
 
-  _q: Ember.computed('q', 'processor', {
+  _q: computed('q', 'processor', {
     get() {
       var filter = this.get('processor');
       return filter.Q.value;
@@ -68,7 +70,7 @@ export default Ember.Component.extend( ProcessorMixin, {
     }
   }),
 
-  _gain: Ember.computed('gain', 'processor', {
+  _gain: computed('gain', 'processor', {
     get() {
       var filter = this.get('processor');
       return filter.gain.value;
