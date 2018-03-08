@@ -1,7 +1,9 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { alias } from '@ember/object/computed';
+
+import Component from '@ember/component';
 // import ProcessorMixin from 'ember-audio/mixins/processor';
 import layout from '../templates/components/audio-gain';
 
@@ -16,7 +18,7 @@ import layout from '../templates/components/audio-gain';
   @namespace Components
   @uses EmberAudio.ProcessorMixin
 */
-export default Ember.Component.extend( /*ProcessorMixin,*/{
+export default Component.extend( /*ProcessorMixin,*/{
 
   layout: layout,
 
@@ -32,7 +34,7 @@ export default Ember.Component.extend( /*ProcessorMixin,*/{
     @property gain
     @type {Number}
   */
-  gain: Ember.computed.alias('gainObject.gain'),
+  gain: alias('gainObject.gain'),
   //gain: 0.3,
 
   /**

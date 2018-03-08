@@ -1,7 +1,7 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import EmberObject from '@ember/object';
 import AudioBusMixin from 'ember-audio/mixins/audio-bus';
 
 /**
@@ -11,7 +11,7 @@ import AudioBusMixin from 'ember-audio/mixins/audio-bus';
   @namespace Objects
   @uses EmberAudio.AudioBusMixin
 */
-export default Ember.Object.extend( AudioBusMixin, {
+export default EmberObject.extend( AudioBusMixin, {
 
   /**
     This is required and is not automatically injected.  Pass in the audioService

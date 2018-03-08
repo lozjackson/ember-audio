@@ -1,7 +1,9 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { inject as service } from '@ember/service';
+
+import Component from '@ember/component';
 import AudioBusMixin from 'ember-audio/mixins/audio-bus';
 import layout from '../templates/components/audio-bus';
 
@@ -12,7 +14,7 @@ import layout from '../templates/components/audio-bus';
   @namespace Components
   @uses EmberAudio.AudioBusMixin
 */
-export default Ember.Component.extend( AudioBusMixin, {
+export default Component.extend( AudioBusMixin, {
 
   layout: layout,
 
@@ -25,5 +27,5 @@ export default Ember.Component.extend( AudioBusMixin, {
     @type {Object}
     @private
   */
-  audioService: Ember.inject.service()
+  audioService: service()
 });

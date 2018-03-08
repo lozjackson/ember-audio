@@ -1,6 +1,11 @@
 /**
   @module ember-audio
 */
+import { assert } from '@ember/debug';
+
+import { alias } from '@ember/object/computed';
+import { A } from '@ember/array';
+import Service from '@ember/service';
 import Ember from 'ember';
 import AudioBusObject from 'ember-audio/objects/audio-bus';
 import ChannelStrip from 'ember-audio/objects/channel-strip';
@@ -69,7 +74,7 @@ var audioContext = new AudioContext();
   @class AudioService
   @namespace Services
 */
-export default Ember.Service.extend({
+export default Service.extend({
 
   /**
     ## AudioContext
@@ -97,7 +102,7 @@ export default Ember.Service.extend({
     @property busses
     @type {Array}
   */
-  busses: Ember.A(),
+  busses: A(),
 
   /**
     ## Channels
@@ -115,7 +120,7 @@ export default Ember.Service.extend({
     @property channels
     @type {Array}
   */
-  channels: Ember.A(),
+  channels: A(),
 
   /**
     ## Destination
@@ -134,7 +139,7 @@ export default Ember.Service.extend({
     @property destination
     @type {Object}
   */
-  destination: Ember.computed.alias('audioContext.destination'),
+  destination: alias('audioContext.destination'),
 
   /**
     Createa a new `AudioContext` object.
@@ -146,8 +151,8 @@ export default Ember.Service.extend({
     this._super(...arguments);
     this.checkState();
     this.setProperties({
-      busses: Ember.A(),
-      channels: Ember.A()
+      busses: A(),
+      channels: A()
     });
   },
 
@@ -159,7 +164,7 @@ export default Ember.Service.extend({
   */
   checkState() {
     var context = this.get('audioContext');
-    Ember.assert('`audioContext` should not be null', context);
+    assert('`audioContext` should not be null', context);
     if ( context && context.state === 'running' ) {
       Ember.Logger.debug(`Ember-audio: ${context.sampleRate / 1000} Khz; Channel count: ${context.destination.channelCount}`);
     }

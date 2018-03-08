@@ -1,7 +1,10 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { observer } from '@ember/object';
+
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 import layout from '../templates/components/audio-player';
 
 /**
@@ -10,7 +13,7 @@ import layout from '../templates/components/audio-player';
   @class AudioPlayerComponent
   @namespace Components
 */
-export default Ember.Component.extend({
+export default Component.extend({
   layout: layout,
 
   /**
@@ -18,7 +21,7 @@ export default Ember.Component.extend({
     @type {Object}
     @private
   */
-  audioService: Ember.inject.service(),
+  audioService: service(),
 
   /**
     @property tagName
@@ -129,7 +132,7 @@ export default Ember.Component.extend({
 
     @method outputChanged
   */
-  ouputChanged: Ember.observer('output', 'player', function() {
+  ouputChanged: observer('output', 'player', function() {
     var output = this.get('output');
     var player = this.get('player');
     if ( player ) {

@@ -1,9 +1,9 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import Mixin from '@ember/object/mixin';
 
-var alias = Ember.computed.alias;
+import { alias } from '@ember/object/computed';
 
 /**
   This mixin provides properties and methods for the i/o of the processing node.
@@ -11,7 +11,7 @@ var alias = Ember.computed.alias;
   @class ProcessorMixin
   @namespace Mixins
 */
-export default Ember.Mixin.create({
+export default Mixin.create({
 
 
   /**

@@ -1,9 +1,8 @@
-import Ember from 'ember';
+import Controller from '@ember/controller';
+import { computed } from '@ember/object';
 import GainObject from 'ember-audio/objects/gain';
 
-var computed = Ember.computed;
-
-export default Ember.Controller.extend({
+export default Controller.extend({
   channel: computed('audioService.channels.[]', function () {
     return this.audioService.get('channels').objectAt(0);
   }),

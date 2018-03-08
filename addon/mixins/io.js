@@ -1,7 +1,11 @@
 /**
   @module ember-audio
 */
-import Ember from 'ember';
+import { typeOf } from '@ember/utils';
+
+import EmberObject, { observer } from '@ember/object';
+import { A } from '@ember/array';
+import Mixin from '@ember/object/mixin';
 
 /**
   This mixin provides an `input` and `output` and methods for connecting to other objects.
@@ -9,7 +13,7 @@ import Ember from 'ember';
   @class IoMixin
   @namespace Mixins
 */
-export default Ember.Mixin.create({
+export default Mixin.create({
 
   /**
     The audio input.
@@ -34,7 +38,7 @@ export default Ember.Mixin.create({
     @type {Array}
     @private
   */
-  inputs: Ember.A(),
+  inputs: A(),
 
   /**
     ## Outputs
@@ -63,7 +67,7 @@ export default Ember.Mixin.create({
   init() {
     this._super(...arguments);
     this.setProperties({
-      inputs: Ember.A(),
+      inputs: A(),
       outputs: []
     });
   },
@@ -106,7 +110,7 @@ export default Ember.Mixin.create({
   registerInput(outputNode, outputNumber) {
     var inputs = this.get('inputs');
     if (outputNode) {
-      inputs.pushObject(Ember.Object.create({
+      inputs.pushObject(EmberObject.create({
         node: outputNode,
         output: outputNumber
       }));
@@ -210,7 +214,7 @@ export default Ember.Mixin.create({
       `processor` property then we need to use the `processor` object as the
       node to connect to.
     */
-    if (Ember.typeOf(node) === 'instance' && node.get('processor')) {
+    if (typeOf(node) === 'instance' && node.get('processor')) {
       node = node.get('processor');
     }
     this.connect(node);
@@ -228,7 +232,7 @@ export default Ember.Mixin.create({
       `processor` property then we need to use the `processor` object as the
       node to connect to.
     */
-    if (Ember.typeOf(node) === 'instance' && node.get('processor')) {
+    if (typeOf(node) === 'instance' && node.get('processor')) {
       node = node.get('processor');
     }
     this.disconnect(node);
@@ -262,7 +266,7 @@ export default Ember.Mixin.create({
     @event inputChanged
     @private
   */
-  inputChanged: Ember.observer('input', 'processor', function() {
+  inputChanged: observer('input', 'processor', function() {
     this.changeInput();
   }),
 
@@ -272,7 +276,7 @@ export default Ember.Mixin.create({
     @event outputChanged
     @private
   */
-  outputChanged: Ember.observer('output', 'processor', function() {
+  outputChanged: observer('output', 'processor', function() {
     this.changeOutput();
   })
 });

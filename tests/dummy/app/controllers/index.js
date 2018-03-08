@@ -1,8 +1,8 @@
-import Ember from 'ember';
+import Controller from '@ember/controller';
 
 // var alias = Ember.computed.alias;
 
-export default Ember.Controller.extend({
+export default Controller.extend({
 
   // bus: alias('audioService.busses.firstObject'),
   // gainNode: null,

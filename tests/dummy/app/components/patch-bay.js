@@ -1,14 +1,18 @@
-import Ember from 'ember';
+import $ from 'jquery';
+import { computed } from '@ember/object';
+import { alias } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
+import Component from '@ember/component';
 
-export default Ember.Component.extend({
+export default Component.extend({
 
-  audioService: Ember.inject.service(),
+  audioService: service(),
 
-  busses: Ember.computed.alias('audioService.busses'),
+  busses: alias('audioService.busses'),
 
   channel: 0,
 
-  bus: Ember.computed('channel', 'busses.[]', function() {
+  bus: computed('channel', 'busses.[]', function() {
     var busses = this.get('busses');
     var channel = this.get('channel');
     return busses.objectAt(channel).bus;
@@ -16,7 +20,7 @@ export default Ember.Component.extend({
 
   actions: {
     selectBus() {
-      const selectedEl    = Ember.$('.bus-select')[0];
+      const selectedEl    = $('.bus-select')[0];
       const selectedIndex = selectedEl.selectedIndex;
       this.set('channel', selectedIndex);
     }

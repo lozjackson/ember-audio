@@ -1,17 +1,17 @@
-import Ember from 'ember';
+import EmberObject from '@ember/object';
 import ProcessorMixin from '../../../mixins/processor';
 import { module, test } from 'qunit';
 
 module('Unit | Mixin | processor');
 
 test('it works', function(assert) {
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin);
+  var ProcessorObject = EmberObject.extend(ProcessorMixin);
   var subject = ProcessorObject.create();
   assert.ok(subject);
 });
 
 test('audioContext alias', function(assert) {
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin);
+  var ProcessorObject = EmberObject.extend(ProcessorMixin);
   var subject = ProcessorObject.create();
   subject.set('audioService', {
     name: 'audio-service',
@@ -22,7 +22,7 @@ test('audioContext alias', function(assert) {
 
 test('createProcessor method is called when the object is created', function(assert) {
   assert.expect(2);
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
+  var ProcessorObject = EmberObject.extend(ProcessorMixin, {
     createProcessor: function () {
       assert.ok(true, `'createProcessor' method was called`);
     }
@@ -34,7 +34,7 @@ test('createProcessor method is called when the object is created', function(ass
 
 test('processor property is set when object is created', function(assert) {
   assert.expect(1);
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
+  var ProcessorObject = EmberObject.extend(ProcessorMixin, {
     createProcessor: function () {
       return { test: 1 };
     }
@@ -46,7 +46,7 @@ test('processor property is set when object is created', function(assert) {
 
 test('connectProcessor method is called when the object is created', function(assert) {
   assert.expect(2);
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
+  var ProcessorObject = EmberObject.extend(ProcessorMixin, {
     createProcessor: function () {
       return { test: 1 };
     },
@@ -61,9 +61,9 @@ test('connectProcessor method is called when the object is created', function(as
 
 test('connectProcessor method is called with correct params', function(assert) {
   assert.expect(3);
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
+  var ProcessorObject = EmberObject.extend(ProcessorMixin, {
     createProcessor: function () {
-      return Ember.Object.create({ test: 1 });
+      return EmberObject.create({ test: 1 });
     },
     connectProcessor: function (processor) {
       assert.ok(true, `'connectProcessor' method was called`);
@@ -84,7 +84,7 @@ test('connectProcessor method connects input to processor to output', function(a
     }
   };
 
-  var ProcessorObject = Ember.Object.extend(ProcessorMixin, {
+  var ProcessorObject = EmberObject.extend(ProcessorMixin, {
     input: input,
     output: output,
     connectOutput: function (obj) {
